@@ -3,16 +3,10 @@ import os
 
 from flask import Flask
 from flask import render_template
-
+from handlers import site
 
 app = Flask(__name__)
-
-
-@app.route('/')
-def home_page():
-    now = datetime.datetime.now()
-    return render_template('home.html', current_time=now.ctime())
-
+app.register_blueprint(site)
 
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
