@@ -6,6 +6,7 @@
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
 	crossorigin="anonymous">
+
 <!-- Optional theme -->
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
@@ -19,9 +20,6 @@
 	crossorigin="anonymous"></script>
 <meta charset="utf-8" />
 <title>ShakeSpace - {% block title %}{% endblock %}</title>
-<link rel="stylesheet"
-	href="{{ url_for('static', filename='style.css') }}" />
-</head>
 <body>
 	<header>
 		<nav class="navbar navbar-dark bg-inverse">
@@ -65,26 +63,26 @@
 
 		</nav>
 	</header>
-	<div class="col-md-3">
-		<nav class="navbar navbar-default" role="navigation">
-			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse"
-					data-target=".navbar-ex1-collapse">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">Topics</a>
-			</div>
+	<div class="row bg-info">
+		<div class="col-md-3">
+			<nav class="navbar navbar-default" role="navigation">
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+						data-target=".navbar-ex1-collapse">
+						<span class="sr-only">Toggle navigation</span> <span
+							class="icon-bar"></span> <span class="icon-bar"></span> <span
+							class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">Topics</a>
+				</div>
 
-			<div class="collapse navbar-collapse navbar-ex1-collapse">
-				
-			</div>
-		</nav>
+				<div class="collapse navbar-collapse navbar-ex1-collapse"></div>
+			</nav>
+		</div>
+
+		<div class="col-md-9">{% block content %} {% endblock %}</div>
 	</div>
-
-	<div class="col-md-9">{% block content %} {% endblock %}</div>
 	<footer> &copy; 2016, ShakeSpace </footer>
 </body>
 </html>
