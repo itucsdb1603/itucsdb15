@@ -22,3 +22,7 @@ def signup_page():
 @site.route('/announcements')
 def announcements_page():
     return render_template('announcements.html')
+
+@site.route('/moderators')
+def moderators_page():
+    return render_template('moderators.html')
