@@ -14,3 +14,11 @@ def home_page():
 @site.route('/events')
 def events_page():
     return render_template('events.html')
+
+@site.route('/signup')
+def signup_page():
+    return render_template('signup.html')
+
+@site.route('/announcements')
+def announcements_page():
+    return render_template('announcements.html')
