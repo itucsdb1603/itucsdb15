@@ -23,6 +23,12 @@ def signup_page():
 def announcements_page():
     return render_template('announcements.html')
 
+<<<<<<< HEAD
 @site.route('/hashtags')
 def hashtags_page():
     return render_template('hashtags.html')
+=======
+@site.route('/moderators')
+def moderators_page():
+    return render_template('moderators.html')
+>>>>>>> 8531941bfa739d2a234d5ff4022e8fbbbd0aa2a1
