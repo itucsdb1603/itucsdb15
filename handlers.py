@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template
 
 from datetime import datetime
 from flask import current_app, request
@@ -49,3 +49,4 @@ def mod_add_page():
         moderator = Moderator(nickname, password)
         current_app.moderatorlist.add_moderator(moderator)
         return redirect(url_for('site.moderator_page', mod_id=moderator._id))
+

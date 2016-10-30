@@ -26,6 +26,22 @@ def get_elephantsql_dsn(vcap_services):
              dbname='{}'""".format(user, password, host, port, dbname)
     return dsn
 
+@app.route('/initmods')
+def init_mod_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        query = """DROP TABLE IF EXISTS MODERATORS"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE MODERATORS (ID INTEGER)"""
+        cursor.execute(query)
+
+        query = """INSERT INTO MODERATORS (ID) VALUES (0)"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:
