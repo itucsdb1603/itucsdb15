@@ -2,13 +2,27 @@
 {% block title %}Moderators{% endblock %}
 {% block content %}
     <h1>Moderators</h1>
+
+    {% if moderators %}
     <ul>
-    	<li>Julian Casablancas</li>
+    	{% for mod_id, moderator in moderators %}
+        <li>
+        <a href="{{ url_for('site.moderator_page', mod_id=mod_id) }}">
+          {{ moderator.nickname }}
+          {{ moderator.password }}
+         </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <ul>
+    	<li><a href="{{ url_for('site.mod_add_page') }}">Add Moderator</a></li>
     	<li>Nick Valensi</li>
     	<li>Albert Hammond Jr.</li>
     	<li>Nikolai Fraiture</li>
     	<li>Fabrizio Moretti</li>
-    	
+
     </ul>
-    
+
 {% endblock %}

@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, url_for
 
 from datetime import datetime
-from flask import current_app
+from flask import current_app, request
+from moderator import Moderator
+from moderatorlist import ModeratorList
 
 site = Blueprint('site', __name__)
 
@@ -29,5 +31,21 @@ def hashtags_page():
 
 @site.route('/moderators')
 def moderators_page():
-    return render_template('moderators.html')
+    moderators = current_app.moderatorlist.get_moderators()
+    return render_template('moderators.html', moderators=sorted(moderators.items()))
 
+@site.route('/moderator/<int:mod_id>')
+def moderator_page(mod_id):
+    moderator = current_app.moderatorlist.get_moderator(mod_id)
+    return render_template('moderator.html', moderator=moderator)
+
+@site.route('/moderators/add', methods=['GET', 'POST'])
+def mod_add_page():
+    if request.method == 'GET':
+        return render_template('modedit.html')
+    else:
+        nickname = request.form['nickname']
+        password = request.form['password']
+        moderator = Moderator(nickname, password)
+        current_app.moderatorlist.add_moderator(moderator)
+        return redirect(url_for('site.moderator_page', mod_id=moderator._id))
