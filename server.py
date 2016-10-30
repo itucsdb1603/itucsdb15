@@ -41,7 +41,28 @@ def init_mod_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+@app.route('/init_announcements')
+def init_announcements_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS ANNOUNCEMENTS"""
+        cursor.execute(query)
 
+        query = """CREATE TABLE ANNOUNCEMENTS (
+        ID SERIAL NOT NULL,
+        CONTENT VARCHAR(300),
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES ('Sample announcement!')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+        
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:
