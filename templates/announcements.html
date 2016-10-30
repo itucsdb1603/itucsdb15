@@ -2,12 +2,27 @@
 {% block title %}Events{% endblock %}
 {% block content %}
     <h1>Announcements</h1>
-	<ul>
-      <li>I'm looing for housemate at Besiktas. </li>
-      <li>Urgently needed 0 rh+ blood, Capa Hospital, Tel:05302921159. </li>
-      <li>Yoga for starters. </li>
-      <li>Android development tutorials. </li>
-      <li>Best Turkish movies. </li>
-      <li>iPhone7 or Samsung Galaxy ? </li>
-    </ul>
+
+<form action="/announcements" method="POST">
+	<h1> Add an announcement: </h1>
+	<input type="text" name="CONTENT" >
+	<input type="submit" name="add_announcement" value="Announce!" />
+
+	<br><br>
+	<table border="1px">
+		<tr>
+			<th>ID</th>
+			<th>Content</th>
+		</tr>
+		{% for announcement in announcements %}
+		<tr>
+			<td>{{announcement[0]}}</td>
+			<td>{{announcement[1]}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<br><br><br><br>
+	<input type="submit" name="init_announcements" value="INITIALIZE ANNOUNCEMENTS DATABASE!" />
+</form>
 {% endblock %}

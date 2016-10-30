@@ -21,10 +21,6 @@ def events_page():
 def signup_page():
     return render_template('signup.html')
 
-@site.route('/announcements')
-def announcements_page():
-    return render_template('announcements.html')
-
 @site.route('/hashtags')
 def hashtags_page():
     return render_template('hashtags.html')

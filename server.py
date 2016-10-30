@@ -7,6 +7,7 @@ import psycopg2 as dbapi2
 from flask import Flask
 from flask import redirect
 from flask import render_template
+from flask import request
 from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
@@ -41,6 +42,35 @@ def init_mod_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+
+@app.route('/announcements',  methods=['GET', 'POST'])
+def announcements_page():
+    if 'add_announcement' in request.form:
+        content = str(request.form['CONTENT'])
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+        
+            cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES (%s)""", [content])
+
+            connection.commit()
+
+    elif 'init_announcements' in request.form:
+        init_announcements_db()
+
+    allAnnouncements = get_announcements()
+    return render_template('announcements.html', announcements = allAnnouncements)
+
+def get_announcements():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        cursor.execute("SELECT * FROM ANNOUNCEMENTS")
+        announcements = cursor.fetchall()
+        
+        connection.commit()
+        
+        return announcements
     
 @app.route('/init_announcements')
 def init_announcements_db():
