@@ -4,6 +4,8 @@ from datetime import datetime
 from flask import current_app, request
 from moderator import Moderator
 from moderatorlist import ModeratorList
+from hashtag import Hashtag
+from hashtags import Hashtags
 
 site = Blueprint('site', __name__)
 
@@ -27,7 +29,23 @@ def announcements_page():
 
 @site.route('/hashtags')
 def hashtags_page():
-    return render_template('hashtags.html')
+    hashtags = current_app.hashtags.get_hashtags()
+    return render_template('hashtags.html', hashtags = hashtags.items())
+
+@site.route('/hashtag/<int:hashtag_id>')
+def hashtag_page(hashtag_id):
+    hashtag = current_app.hashtags.get_hashtag(hashtag_id)
+    return render_template('hashtag.html', hashtag=hashtag)
+
+@site.route('/hashtags/add', methods=['GET', 'POST'])
+def hashtag_add_page():
+    if request.method == 'GET':
+        return render_template('hashtag_add.html')
+    else:
+        name = request.form['name']
+        hashtag = Hashtag(name)
+        current_app.hashtags.add_hashtag(hashtag)
+        return redirect(url_for('site.hashtag_page', hashtag_id=hashtag._id))
 
 @site.route('/moderators')
 def moderators_page():

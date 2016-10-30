@@ -10,6 +10,7 @@ from flask import render_template
 from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
+from hashtags import Hashtags
 
 app = Flask(__name__)
 app.register_blueprint(site)
@@ -41,12 +42,12 @@ def init_mod_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/init_announcements')
 def init_announcements_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
-        
+
         query = """DROP TABLE IF EXISTS ANNOUNCEMENTS"""
         cursor.execute(query)
 
@@ -59,10 +60,34 @@ def init_announcements_db():
 
         query = """INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES ('Sample announcement!')"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
-        
+
+
+app.hashtags = Hashtags()
+
+@app.route('/init_hashtags')
+def init_hashtags_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS HASHTAGS"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE HASHTAGS (
+        ID SERIAL NOT NULL,
+        NAME VARCHAR(50),
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO HASHTAGS (NAME) VALUES ('#BazenHayat')"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:

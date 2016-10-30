@@ -3,6 +3,20 @@
 {% block content %}
     <h1>Hashtags</h1>
 	<ul>
+	<a href="{{ url_for('site.hashtag_add_page') }}">Add Hashtag</a>
+	</ul>
+	{% if hashtags %}
+    <ul>
+    	{% for hashtag_id, hashtag in hashtags %}
+        <li>
+        <a href="{{ url_for('site.hashtag_page', hashtag_id = hashtag_id) }}">
+          {{ hashtag.name }}
+         </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+	<ul>
       <li>#Yasarken yazılan tarih</li>
       <li>#29 Ekim</li>
       <li>#Pero Antic</li>
