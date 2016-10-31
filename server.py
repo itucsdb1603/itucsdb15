@@ -42,6 +42,24 @@ def init_mod_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+    
+@app.route('/initevents')
+def init_events_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        query = """DROP TABLE IF EXISTS EVENTS"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE EVENTS (ID INTEGER, CONTENT VARCHAR(300), EVENT_DATE DATE)"""
+        cursor.execute(query)
+
+        query = """INSERT INTO EVENTS (ID, CONTENT, EVENT_DATE) VALUES (0, 'Holi Festival', '20161030')"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
 
 @app.route('/announcements',  methods=['GET', 'POST'])
 def announcements_page():
