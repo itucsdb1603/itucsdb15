@@ -1,13 +1,22 @@
-from flask import Blueprint, render_template
+import os
+import json
+import re
+import psycopg2 as dbapi2
 
+from flask import Blueprint, render_template
+from flask import redirect
+from flask.helpers import url_for
 from datetime import datetime
 from flask import current_app, request
 from moderator import Moderator
 from moderatorlist import ModeratorList
 from hashtag import Hashtag
 from hashtags import Hashtags
+from flask import current_app as app
+from _sqlite3 import Row
 
 site = Blueprint('site', __name__)
+
 
 @site.route('/')
 def home_page():
@@ -58,9 +67,82 @@ def mod_add_page():
     if request.method == 'GET':
         return render_template('modedit.html')
     else:
-        nickname = request.form['nickname']
-        password = request.form['password']
-        moderator = Moderator(nickname, password)
-        current_app.moderatorlist.add_moderator(moderator)
-        return redirect(url_for('site.moderator_page', mod_id=moderator._id))
+        nickname = str(request.form['nickname'])
+        password = str(request.form['password'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            statement ="""INSERT INTO MODERATORS (NICKNAME, PASSWORD) VALUES (%s, %s)"""
+            cursor.execute(statement, (nickname, password))
+            connection.commit()
+
+            moderator = Moderator(nickname, password)
+
+            current_app.moderatorlist.add_moderator(moderator)
+            return redirect(url_for('site.moderator_page', mod_id=moderator._id))
+
+@site.route('/moderators/remove', methods=['GET', 'POST'])
+def mod_remove_page():
+    if request.method == 'GET':
+        return render_template('modremove.html')
+    else:
+        nickname = str(request.form['nickname'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
+            cursor.execute(statement, (nickname,))
+            connection.commit()
+            for row in cursor:
+                id, nickname = row
+            statement ="""DELETE FROM MODERATORS WHERE (ID = (%s))"""
+            cursor.execute(statement, (id,))
+            connection.commit()
+            current_app.moderatorlist.delete_moderator(id)
+            return redirect(url_for('site.moderators_page'))
+
+@site.route('/moderators/update', methods=['GET', 'POST'])
+def mod_update_page():
+    if request.method == 'GET':
+        return render_template('modupdate.html')
+    else:
+        nickname = str(request.form['nickname'])
+        newnickname = str(request.form['newnickname'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement = """UPDATE MODERATORS
+            SET NICKNAME = (%s)
+            WHERE (NICKNAME = (%s))"""
+            cursor.execute(statement, (newnickname, nickname))
+            connection.commit()
+
+            cursor = connection.cursor()
+            statement = """SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
+            cursor.execute(statement, (newnickname,))
+            connection.commit()
+            for row in cursor:
+                id, nickname = row
+            moderatorToUpdate = current_app.moderatorlist.get_moderator(id)
+            moderatorToUpdate.change_nickname(newnickname)
+            return redirect(url_for('site.moderators_page'))
+
+@site.route('/initmods')
+def init_mod_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        query = """DROP TABLE IF EXISTS MODERATORS"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE MODERATORS (
+        ID SERIAL,
+        NICKNAME VARCHAR(20) NOT NULL,
+        PASSWORD VARCHAR(20),
+        NATIONALITY VARCHAR(20),
+        AGE INTEGER,
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
 

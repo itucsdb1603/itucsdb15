@@ -13,10 +13,12 @@ from flask.helpers import url_for
 from moderatorlist import ModeratorList
 from hashtags import Hashtags
 
-app = Flask(__name__)
-app.register_blueprint(site)
-
-app.moderatorlist = ModeratorList()
+def create_app():
+    app = Flask(__name__)
+    app.register_blueprint(site)
+    app.moderatorlist = ModeratorList()
+    return app
+app = create_app()
 
 def get_elephantsql_dsn(vcap_services):
     """Returns the data source name for ElephantSQL."""
@@ -28,23 +30,8 @@ def get_elephantsql_dsn(vcap_services):
              dbname='{}'""".format(user, password, host, port, dbname)
     return dsn
 
-@app.route('/initmods')
-def init_mod_db():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
-        query = """DROP TABLE IF EXISTS MODERATORS"""
-        cursor.execute(query)
 
-        query = """CREATE TABLE MODERATORS (ID INTEGER)"""
-        cursor.execute(query)
 
-        query = """INSERT INTO MODERATORS (ID) VALUES (0)"""
-        cursor.execute(query)
-
-        connection.commit()
-        return redirect(url_for('site.home_page'))
-    
-    
 @app.route('/initevents')
 def init_events_db():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -69,7 +56,7 @@ def announcements_page():
 
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-        
+
             cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES (%s)""", [content])
 
             connection.commit()
@@ -83,15 +70,15 @@ def announcements_page():
 def get_announcements():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
-        
+
         cursor.execute("SELECT * FROM ANNOUNCEMENTS")
         announcements = cursor.fetchall()
-        
+
         connection.commit()
-        
+
         return announcements
-    
-	
+
+
 @app.route('/init_announcements')
 def init_announcements_db():
     with dbapi2.connect(app.config['dsn']) as connection:
