@@ -12,11 +12,14 @@ from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
 from hashtags import Hashtags
-
+from event import Event
+from eventlist import EventList
+ 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
+    app.eventlist = EventList()
     return app
 app = create_app()
 
@@ -39,10 +42,15 @@ def init_events_db():
         query = """DROP TABLE IF EXISTS EVENTS"""
         cursor.execute(query)
 
-        query = """CREATE TABLE EVENTS (ID INTEGER, CONTENT VARCHAR(300), EVENT_DATE DATE)"""
+        query = """CREATE TABLE EVENTS (
+        ID SERIAL NOT NULL, 
+        CONTENT VARCHAR(300), 
+        EVENT_DATE DATE,
+        PRIMARY KEY(ID)
+        )"""
         cursor.execute(query)
 
-        query = """INSERT INTO EVENTS (ID, CONTENT, EVENT_DATE) VALUES (0, 'Holi Festival', '20161030')"""
+        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES ('Holi Festival', '20161030')"""
         cursor.execute(query)
 
         connection.commit()

@@ -1,12 +1,44 @@
 {% extends "layout.html" %}
 {% block title %}Events{% endblock %}
 {% block content %}
-    <h1>Events</h1>
-	<ul>
-      <li>Burning Man</li>
-      <li>La Tomatina</li>
-      <li>NYFW</li>
-      <li>Holi Festival</li>
-      <li>Oktoberfest</li>
+	{% if events %}
+	<h1>Events</h1>
+    	<ul>
+    	{% for event_id, event in events %}
+        <li>
+          {{ event.content }}
+          {{ event.event_date }}
+        </li>
+        {% endfor %}
     </ul>
+    {% endif %}
+    <h4>Add an event</h4>
+    <form role="form" action="" method="post" name="addevent"
+            class="form-horizontal">
+
+
+        <div class="form-group">
+          <label for="title" class="control-label col-sm-2">Event Name:</label>
+          <div class="col-sm-10">
+            <input type="text" name="content" required autofocus />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="year" class="control-label col-sm-2">Event Date:</label>
+          <div class="col-sm-10">
+            <input type="text" name="event_date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" name="save"
+                    class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </form>
+
+	<p>When adding an event date, please make sure it is in the form YYYYMMDD. A datepicker will be added later on.</p>
+	<a href="{{ url_for('site.delete_event') }}">Delete Event</a>
+	
+    
 {% endblock %}
