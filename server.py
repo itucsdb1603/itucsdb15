@@ -80,6 +80,28 @@ def announcements_page():
 
             connection.commit()
 
+    elif 'edit_announcement' in request.form:
+        edit_id = request.form['edit_id']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""SELECT * FROM ANNOUNCEMENTS WHERE ID=%s""", edit_id)
+            selectedAnnouncement = cursor.fetchall()
+            connection.commit()
+
+            return render_template('update_announcement.html', announcements = selectedAnnouncement)
+
+    elif 'selected_announcement_update' in request.form:
+        announcement_id = request.form['id']
+        announcement_content = request.form['content']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""UPDATE ANNOUNCEMENTS SET CONTENT=%s WHERE id=%s""", (announcement_content, announcement_id))
+            connection.commit()
+
     allAnnouncements = get_announcements()
     return render_template('announcements.html', announcements = allAnnouncements)
 
