@@ -33,8 +33,6 @@ def get_elephantsql_dsn(vcap_services):
              dbname='{}'""".format(user, password, host, port, dbname)
     return dsn
 
-
-
 @app.route('/initevents')
 def init_events_db():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -71,6 +69,16 @@ def announcements_page():
 
     elif 'init_announcements' in request.form:
         init_announcements_db()
+
+    elif 'delete_announcement' in request.form:
+        delete_id = request.form['delete_id']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""DELETE FROM ANNOUNCEMENTS WHERE ID=%s""", delete_id)
+
+            connection.commit()
 
     allAnnouncements = get_announcements()
     return render_template('announcements.html', announcements = allAnnouncements)
