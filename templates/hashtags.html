@@ -3,7 +3,9 @@
 {% block content %}
     <h1>Hashtags</h1>
 	<ul>
-	<a href="{{ url_for('site.hashtag_add_page') }}">Add Hashtag</a>
+		<a href="{{ url_for('site.hashtag_add_page') }}">Add Hashtag</a>
+		<a href="{{ url_for('site.hashtag_update_page') }}">Update Hashtag</a>
+		<a href="{{ url_for('site.hashtag_delete_page') }}">Delete Hashtag</a>
 	</ul>
 	{% if hashtags %}
     <ul>

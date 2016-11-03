@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
-{% block title %}Add Hashtag{% endblock %}
+{% block title %}Hashtag Delete{% endblock %}
 {% block content %}
       <div class="page-header">
-        <h1>Add Hashtag</h1>
+        <h1>Delete Hashtag</h1>
       </div>
 
-      <form role="form" action="" method="post" name="hashtag_add"
+      <form role="form" action="" method="post" name="hashtag_remove"
             class="form-horizontal">
         <div class="form-group">
           <label for="title" class="control-label col-sm-2">Name:</label>
@@ -14,10 +14,10 @@
           </div>
         </div>
 
-        <div class="form-group">
+		 <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" name="save"
-                    class="btn btn-primary">Add</button>
+            <button type="submit" name="remove"
+                    class="btn btn-primary">Remove</button>
           </div>
         </div>
       </form>

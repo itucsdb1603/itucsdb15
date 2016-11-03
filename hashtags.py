@@ -4,9 +4,10 @@ class Hashtags:
             self.last_hashtag_id = 0
 
     def add_hashtag(self, hashtag):
-            self.last_hashtag_id += 1
-            self.hashtags[self.last_hahtag_id] = hashtag
+
+            self.hashtags[self.last_hashtag_id] = hashtag
             hashtag._id = self.last_hashtag_id
+            self.last_hashtag_id += 1
 
     def delete_hashtag(self, hashtag_id):
             del self.hashtags[hashtag_id]

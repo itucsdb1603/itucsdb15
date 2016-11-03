@@ -17,6 +17,7 @@ def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
+    app.hashtags = Hashtags()
     return app
 app = create_app()
 
@@ -100,11 +101,8 @@ def init_announcements_db():
         connection.commit()
         return redirect(url_for('site.home_page'))
 
-
-app.hashtags = Hashtags()
-
 @app.route('/init_hashtags')
-def init_hashtags_db():
+def init_hashtag_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
