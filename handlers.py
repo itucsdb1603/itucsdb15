@@ -12,6 +12,8 @@ from moderator import Moderator
 from moderatorlist import ModeratorList
 from hashtag import Hashtag
 from hashtags import Hashtags
+from event import Event
+from eventlist import EventList
 from flask import current_app as app
 from _sqlite3 import Row
 
@@ -24,10 +26,41 @@ def home_page():
     day = now.strftime('%A')
     return render_template('home.html', day_name=day)
 
-@site.route('/events')
+@site.route('/events', methods = ['GET', 'POST'])
 def events_page():
-    return render_template('events.html')
+    if request.method == 'GET':
+        events = current_app.eventlist.get_events()
+        return render_template('events.html', events=sorted(events.items()))
+    else:
+        content = str(request.form['content'])
+        event_date = str(request.form['event_date'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
 
+            statement ="""INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES (%s, %s)"""
+            cursor.execute(statement, (content, event_date))
+            connection.commit()
+
+            event = Event(content, event_date)
+
+            current_app.eventlist.add_event(event)
+            return redirect(url_for('site.events_page', event_id=event._id))
+
+
+@site.route('/events/delete', methods=['GET', 'POST'])
+def delete_event():
+    if request.method == 'GET':
+        return render_template('delete_event.html')
+    else:
+        id = str(request.form['event_id'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""DELETE FROM EVENTS WHERE (ID = (%s))"""
+            cursor.execute(statement, (id,))
+            connection.commit()
+            current_app.eventlist.delete_event(id)
+            return redirect(url_for('site.events_page'))
+        
 @site.route('/signup')
 def signup_page():
     return render_template('signup.html')
@@ -196,5 +229,3 @@ def init_mod_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-
-

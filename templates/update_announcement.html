@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+
+<form action="/announcements" method = "POST">
+	<table border="1px">
+		<tr>
+			<th>ID</th>
+			<th>Announcement Content</th>
+		</tr>
+
+		{% for announcement in announcements %}
+		<tr>
+			<td><input type="text" name="id" value={{announcement[0]}} readonly="readonly"></td>
+			<td><input type="text" name="content" value={{announcement[1]}} autofocus="" ></td>
+		</tr>
+		{% endfor %}
+		
+	</table>
+	
+   <input type="submit" name="selected_announcement_update" value="Update Announcement!">
+</form>
+
+{% endblock %}

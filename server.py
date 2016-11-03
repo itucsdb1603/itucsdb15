@@ -12,12 +12,15 @@ from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
 from hashtags import Hashtags
+from event import Event
+from eventlist import EventList
 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
     app.hashtags = Hashtags()
+    app.eventlist = EventList()
     return app
 app = create_app()
 
@@ -31,8 +34,6 @@ def get_elephantsql_dsn(vcap_services):
              dbname='{}'""".format(user, password, host, port, dbname)
     return dsn
 
-
-
 @app.route('/initevents')
 def init_events_db():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -40,10 +41,15 @@ def init_events_db():
         query = """DROP TABLE IF EXISTS EVENTS"""
         cursor.execute(query)
 
-        query = """CREATE TABLE EVENTS (ID INTEGER, CONTENT VARCHAR(300), EVENT_DATE DATE)"""
+        query = """CREATE TABLE EVENTS (
+        ID SERIAL NOT NULL,
+        CONTENT VARCHAR(300),
+        EVENT_DATE DATE,
+        PRIMARY KEY(ID)
+        )"""
         cursor.execute(query)
 
-        query = """INSERT INTO EVENTS (ID, CONTENT, EVENT_DATE) VALUES (0, 'Holi Festival', '20161030')"""
+        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES ('Holi Festival', '20161030')"""
         cursor.execute(query)
 
         connection.commit()
@@ -64,6 +70,38 @@ def announcements_page():
 
     elif 'init_announcements' in request.form:
         init_announcements_db()
+
+    elif 'delete_announcement' in request.form:
+        delete_id = request.form['delete_id']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""DELETE FROM ANNOUNCEMENTS WHERE ID=%s""", delete_id)
+
+            connection.commit()
+
+    elif 'edit_announcement' in request.form:
+        edit_id = request.form['edit_id']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""SELECT * FROM ANNOUNCEMENTS WHERE ID=%s""", edit_id)
+            selectedAnnouncement = cursor.fetchall()
+            connection.commit()
+
+            return render_template('update_announcement.html', announcements = selectedAnnouncement)
+
+    elif 'selected_announcement_update' in request.form:
+        announcement_id = request.form['id']
+        announcement_content = request.form['content']
+
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            cursor.execute("""UPDATE ANNOUNCEMENTS SET CONTENT=%s WHERE id=%s""", (announcement_content, announcement_id))
+            connection.commit()
 
     allAnnouncements = get_announcements()
     return render_template('announcements.html', announcements = allAnnouncements)
