@@ -14,6 +14,8 @@ from moderatorlist import ModeratorList
 from hashtags import Hashtags
 from event import Event
 from eventlist import EventList
+from place import Place
+from placelist import PlaceList
 
 def create_app():
     app = Flask(__name__)
@@ -21,6 +23,7 @@ def create_app():
     app.moderatorlist = ModeratorList()
     app.hashtags = Hashtags()
     app.eventlist = EventList()
+    app.placelist = PlaceList()
     return app
 app = create_app()
 
@@ -49,12 +52,33 @@ def init_events_db():
         )"""
         cursor.execute(query)
 
+        
         query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES ('Holi Festival', '20161030')"""
         cursor.execute(query)
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+@app.route('/initplaces')
+def init_places_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
 
+        query = """DROP TABLE IF EXISTS PLACES"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE PLACES (
+        ID SERIAL,
+        AREA VARCHAR(300),
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO PLACES (AREA) VALUES ('New Delhi')"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
 
 @app.route('/announcements',  methods=['GET', 'POST'])
 def announcements_page():
@@ -138,7 +162,7 @@ def init_announcements_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-
+    
 @app.route('/init_hashtags')
 def init_hashtag_db():
     with dbapi2.connect(app.config['dsn']) as connection:

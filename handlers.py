@@ -14,6 +14,8 @@ from hashtag import Hashtag
 from hashtags import Hashtags
 from event import Event
 from eventlist import EventList
+from place import Place
+from placelist import PlaceList
 from flask import current_app as app
 from _sqlite3 import Row
 
@@ -65,6 +67,46 @@ def delete_event():
             connection.commit()
             current_app.eventlist.delete_event(id)
             return redirect(url_for('site.events_page'))
+        
+@site.route('/places', methods = ['GET', 'POST'])
+def places_page():
+    if request.method == 'GET':
+        places = current_app.placelist.get_places()
+        return render_template('places.html', places=sorted(places.items()))
+    else:
+        area = str(request.form['area'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            statement ="""INSERT INTO PLACES (AREA) VALUES (%s)"""
+            cursor.execute(statement, [area])
+            connection.commit()
+
+            place = Place(area)
+
+            current_app.placelist.add_place(place)
+            return redirect(url_for('site.places_page', place_id=place._id))
+
+
+@site.route('/places/delete', methods=['GET', 'POST'])
+def delete_place():
+    if request.method == 'GET':
+        return render_template('delete_place.html')
+    else:
+        area = str(request.form['area'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""SELECT ID, AREA FROM PLACES WHERE (AREA = (%s))"""
+            cursor.execute(statement, (area,))
+            connection.commit()
+            for row in cursor:
+                id, area = row
+            statement ="""DELETE FROM PLACES WHERE (ID = (%s))"""
+            cursor.execute(statement, (id,))
+            connection.commit()
+            current_app.placelist.delete_place(id)
+            return redirect(url_for('site.places_page'))
+
         
 @site.route('/signup')
 def signup_page():
