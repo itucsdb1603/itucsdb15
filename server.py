@@ -90,11 +90,12 @@ def init_places_db():
 def announcements_page():
     if 'add_announcement' in request.form:
         content = str(request.form['CONTENT'])
+        area_id = str(request.form['AREA_ID'])
 
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
 
-            cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES (%s)""", [content])
+            cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES (%s, %s)""", [content, area_id])
 
             connection.commit()
 
@@ -134,7 +135,8 @@ def announcements_page():
             connection.commit()
 
     allAnnouncements = get_announcements()
-    return render_template('announcements.html', announcements = allAnnouncements)
+    allPlaces = get_places()
+    return render_template('announcements.html', announcements = allAnnouncements, places = allPlaces)
 
 def get_announcements():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -146,6 +148,17 @@ def get_announcements():
         connection.commit()
 
         return announcements
+
+def get_places():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT * FROM PLACES")
+        places = cursor.fetchall()
+
+        connection.commit()
+
+        return places
 
 
 @app.route('/init_announcements')

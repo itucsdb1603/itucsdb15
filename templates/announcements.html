@@ -6,10 +6,11 @@
 <form action="/announcements" method="POST">
 	<h1> Add an announcement: </h1>
 	<input type="text" name="CONTENT" >
+	<input type="number" name="AREA_ID" >
 	<input type="submit" name="add_announcement" value="Announce!" />
 
 	<br><br>
-	<table border="1px">
+	<table border="1px" width="1000">
 		<tr>
 			<th>ID</th>
 			<th>Content</th>
@@ -33,5 +34,19 @@
 
 	<br><br><br><br>
 	<input type="submit" name="init_announcements" value="INITIALIZE ANNOUNCEMENTS DATABASE!" />
+
+	<br><br>
+	<table width="600">
+	<tr>
+		<th>ID</th>
+		<th>Place</th>
+	</tr>
+	{% for place in places %}
+	<tr>
+		<td>{{place[0]}}</td>
+		<td>{{place[1]}}</td>
+	</tr>
+	{% endfor %}
+	</table>
 </form>
 {% endblock %}
