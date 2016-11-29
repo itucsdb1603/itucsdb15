@@ -48,14 +48,20 @@ def init_events_db():
         ID SERIAL NOT NULL,
         CONTENT VARCHAR(300),
         EVENT_DATE DATE,
+        AREA_ID INTEGER,
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
 
-        
-        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES ('Holi Festival', '20161030')"""
+        query = """ALTER TABLE EVENTS
+        ADD FOREIGN KEY(AREA_ID)
+        REFERENCES PLACES(AREA_ID)
+        ON DELETE CASCADE"""
         cursor.execute(query)
-
+        
+        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES ('Holi Festival', '20161030', 1)"""
+        cursor.execute(query)
+        
         connection.commit()
         return redirect(url_for('site.home_page'))
     
@@ -64,13 +70,13 @@ def init_places_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        query = """DROP TABLE IF EXISTS PLACES"""
+        query = """DROP TABLE IF EXISTS PLACES CASCADE"""
         cursor.execute(query)
 
         query = """CREATE TABLE PLACES (
-        ID SERIAL,
+        AREA_ID SERIAL,
         AREA VARCHAR(300),
-        PRIMARY KEY(ID)
+        PRIMARY KEY(AREA_ID)
         )"""
         cursor.execute(query)
 

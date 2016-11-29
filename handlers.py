@@ -96,12 +96,12 @@ def delete_place():
         area = str(request.form['area'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-            statement ="""SELECT ID, AREA FROM PLACES WHERE (AREA = (%s))"""
+            statement ="""SELECT AREA_ID, AREA FROM PLACES WHERE (AREA = (%s))"""
             cursor.execute(statement, (area,))
             connection.commit()
             for row in cursor:
                 id, area = row
-            statement ="""DELETE FROM PLACES WHERE (ID = (%s))"""
+            statement ="""DELETE FROM PLACES WHERE (AREA_ID = (%s))"""
             cursor.execute(statement, (id,))
             connection.commit()
             current_app.placelist.delete_place(id)
