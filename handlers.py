@@ -32,15 +32,21 @@ def home_page():
 def events_page():
     if request.method == 'GET':
         events = current_app.eventlist.get_events()
-        return render_template('events.html', events=sorted(events.items()))
+        places = current_app.placelist.get_places()
+        return render_template('events.html', events=sorted(events.items()), places=sorted(places.items()))
     else:
         content = str(request.form['content'])
+        place = str(request.form['option'])
         event_date = str(request.form['event_date'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
-            statement ="""INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES (%s, %s)"""
-            cursor.execute(statement, (content, event_date))
+            statement = """SELECT AREA_ID, AREA FROM PLACES WHERE (AREA=(%s))"""
+            cursor.execute(statement, (place,))
+            connection.commit()
+            for row in cursor:
+                area_id, place = row
+            statement ="""INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES (%s, %s, %s)"""
+            cursor.execute(statement, (content, event_date, area_id,))
             connection.commit()
 
             event = Event(content, event_date)
