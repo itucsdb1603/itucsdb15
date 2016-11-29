@@ -140,7 +140,7 @@ def get_announcements():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        cursor.execute("SELECT * FROM ANNOUNCEMENTS")
+        cursor.execute("SELECT ID, CONTENT, AREA FROM ANNOUNCEMENTS JOIN PLACES ON (ANNOUNCEMENTS.AREA_ID = PLACES.AREA_ID)")
         announcements = cursor.fetchall()
 
         connection.commit()
@@ -153,17 +153,21 @@ def init_announcements_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        query = """DROP TABLE IF EXISTS ANNOUNCEMENTS"""
+        query = """DROP TABLE IF EXISTS ANNOUNCEMENTS CASCADE"""
         cursor.execute(query)
 
         query = """CREATE TABLE ANNOUNCEMENTS (
         ID SERIAL NOT NULL,
         CONTENT VARCHAR(300),
-        PRIMARY KEY(ID)
+        AREA_ID SERIAL,
+        PRIMARY KEY(ID),
+        FOREIGN KEY(AREA_ID) REFERENCES PLACES(AREA_ID)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
         )"""
         cursor.execute(query)
 
-        query = """INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES ('Sample announcement!')"""
+        query = """INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES ('Sample announcement!', 1)"""
         cursor.execute(query)
 
         connection.commit()

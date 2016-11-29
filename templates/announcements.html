@@ -13,11 +13,13 @@
 		<tr>
 			<th>ID</th>
 			<th>Content</th>
+			<th>Area</th>
 		</tr>
 		{% for announcement in announcements %}
 		<tr>
 			<td>{{announcement[0]}}</td>
 			<td>{{announcement[1]}}</td>
+			<td>{{announcement[2]}}</td>
 		</tr>
 		{% endfor %}
 	</table>
