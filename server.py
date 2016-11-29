@@ -219,6 +219,7 @@ def init_user_db():
         USERNAME VARCHAR(30),
         PASSWORD VARCHAR(15),
         MAIL_ID INTEGER,
+        ENTRY_ID INTEGER,
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
@@ -226,6 +227,9 @@ def init_user_db():
         query = """ALTER TABLE USERS
         ADD FOREIGN KEY(MAIL_ID)
         REFERENCES MAILS(MAIL_ID)
+        ON DELETE CASCADE,
+        ADD FOREIGN KEY(ENTRY_ID)
+        REFERENCES ENTRIES(ENTRY_ID)
         ON DELETE CASCADE"""
         cursor.execute(query)
         
@@ -253,6 +257,27 @@ def init_mails_db():
         query = """INSERT INTO MAILS (EMAIL) VALUES ('example@example.com')"""
         cursor.execute(query)
 
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+    
+@app.route('/init_entries')
+def init_entries_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS ENTRIES CASCADE"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE ENTRIES(
+        ENTRY_ID SERIAL,
+        ENTRY VARCHAR(300),
+        PRIMARY KEY(ENTRY_ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO ENTRIES (ENTRY) VALUES ('This is an entry')"""
+        cursor.execute(query)
+        
         connection.commit()
         return redirect(url_for('site.home_page'))
 
