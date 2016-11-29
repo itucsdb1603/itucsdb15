@@ -211,22 +211,48 @@ def init_hashtag_db():
 def init_user_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
-        
         query = """DROP TABLE IF EXISTS USERS"""
         cursor.execute(query)
         
         query = """CREATE TABLE USERS(
         ID SERIAL NOT NULL,
         USERNAME VARCHAR(30),
-        EMAIL VARCHAR(50),
         PASSWORD VARCHAR(15),
+        MAIL_ID INTEGER,
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
         
-        query = """INSERT INTO USERS (USERNAME,EMAIL,PASSWORD) VALUES ('EXAMPLE','EXAMPLE@EXAMPLE.COM','123456')"""
+        query = """ALTER TABLE USERS
+        ADD FOREIGN KEY(MAIL_ID)
+        REFERENCES MAILS(MAIL_ID)
+        ON DELETE CASCADE"""
         cursor.execute(query)
         
+        query = """INSERT INTO USERS (USERNAME,PASSWORD) VALUES ('EXAMPLE USER','123456')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
+@app.route('/init_mails')
+def init_mails_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS MAILS CASCADE"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE MAILS (
+        MAIL_ID SERIAL,
+        EMAIL VARCHAR(100),
+        PRIMARY KEY(MAIL_ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO MAILS (EMAIL) VALUES ('example@example.com')"""
+        cursor.execute(query)
+
         connection.commit()
         return redirect(url_for('site.home_page'))
 
