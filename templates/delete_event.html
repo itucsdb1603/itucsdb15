@@ -6,6 +6,7 @@
     	<ul>
     	{% for event_id, event in events %}
         <li>
+        
           {{ event.content }}
           {{ event.event_date }}
         </li>
@@ -18,9 +19,9 @@
             class="form-horizontal">
 
         <div class="form-group">
-          <label for="title" class="control-label col-sm-2">Event ID:</label>
+          <label for="title" class="control-label col-sm-2">Event Name:</label>
           <div class="col-sm-10">
-            <input type="text" name="event_id" required autofocus />
+            <input type="text" name="content" required autofocus />
           </div>
         </div>
 

@@ -52,9 +52,14 @@ def delete_event():
     if request.method == 'GET':
         return render_template('delete_event.html')
     else:
-        id = str(request.form['event_id'])
+        content = str(request.form['content'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
+            statement ="""SELECT ID, CONTENT FROM EVENTS WHERE (CONTENT = (%s))"""
+            cursor.execute(statement, (content,))
+            connection.commit()
+            for row in cursor:
+                id, content = row
             statement ="""DELETE FROM EVENTS WHERE (ID = (%s))"""
             cursor.execute(statement, (id,))
             connection.commit()
