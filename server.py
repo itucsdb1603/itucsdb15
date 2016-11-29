@@ -206,6 +206,29 @@ def init_hashtag_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+@app.route('/init_users')
+def init_user_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS USERS"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE USERS(
+        ID SERIAL NOT NULL,
+        USERNAME VARCHAR(30),
+        EMAIL VARCHAR(50),
+        PASSWORD VARCHAR(15),
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO USERS (USERNAME,EMAIL,PASSWORD) VALUES ('EXAMPLE','EXAMPLE@EXAMPLE.COM','123456')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
 
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
