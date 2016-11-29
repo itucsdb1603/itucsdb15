@@ -6,8 +6,9 @@
     	<ul>
     	{% for event_id, event in events %}
         <li>
-          {{ event.content }}
-          {{ event.event_date }}
+          <b>Event Name: </b>{{ event.content }}
+          <b>Event Date: </b>{{ event.event_date }}
+          <b>Event Place: </b>{{ event.place }}
         </li>
         {% endfor %}
     	</ul>

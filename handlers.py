@@ -49,7 +49,7 @@ def events_page():
             cursor.execute(statement, (content, event_date, area_id,))
             connection.commit()
 
-            event = Event(content, event_date)
+            event = Event(content, event_date, place)
 
             current_app.eventlist.add_event(event)
             return redirect(url_for('site.events_page', event_id=event._id))

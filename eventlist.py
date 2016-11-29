@@ -2,6 +2,7 @@ class EventList:
     def __init__(self):
             self.events = {}
             self.last_event_id = 0
+            self.place = {}
 
     def add_event(self, event):
             self.last_event_id += 1
