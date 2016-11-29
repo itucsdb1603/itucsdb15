@@ -11,20 +11,25 @@ from flask import request
 from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
+from imgpostlist import ImgPostList
 from hashtags import Hashtags
 from hashtag import Hashtag
 from hashtagContent import HashtagContent
 from hashtagContents import HashtagContents
 from event import Event
 from eventlist import EventList
+from place import Place
+from placelist import PlaceList
 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
+    app.imgpostlist = ImgPostList()
     app.hashtags = Hashtags()
     app.hashtagContents = HashtagContents()
     app.eventlist = EventList()
+    app.placelist = PlaceList()
     return app
 app = create_app()
 
@@ -49,26 +54,54 @@ def init_events_db():
         ID SERIAL NOT NULL,
         CONTENT VARCHAR(300),
         EVENT_DATE DATE,
+        AREA_ID INTEGER,
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
 
-        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES ('Holi Festival', '20161030')"""
+        query = """ALTER TABLE EVENTS
+        ADD FOREIGN KEY(AREA_ID)
+        REFERENCES PLACES(AREA_ID)
+        ON DELETE CASCADE"""
+        cursor.execute(query)
+
+        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES ('Holi Festival', '20161030', 1)"""
         cursor.execute(query)
 
         connection.commit()
         return redirect(url_for('site.home_page'))
 
+@app.route('/initplaces')
+def init_places_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS PLACES CASCADE"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE PLACES (
+        AREA_ID SERIAL,
+        AREA VARCHAR(300),
+        PRIMARY KEY(AREA_ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO PLACES (AREA) VALUES ('New Delhi')"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
 
 @app.route('/announcements',  methods=['GET', 'POST'])
 def announcements_page():
     if 'add_announcement' in request.form:
         content = str(request.form['CONTENT'])
+        area_id = str(request.form['AREA_ID'])
 
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
 
-            cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES (%s)""", [content])
+            cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES (%s, %s)""", [content, area_id])
 
             connection.commit()
 
@@ -108,18 +141,30 @@ def announcements_page():
             connection.commit()
 
     allAnnouncements = get_announcements()
-    return render_template('announcements.html', announcements = allAnnouncements)
+    allPlaces = get_places()
+    return render_template('announcements.html', announcements = allAnnouncements, places = allPlaces)
 
 def get_announcements():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        cursor.execute("SELECT * FROM ANNOUNCEMENTS")
+        cursor.execute("SELECT ID, CONTENT, AREA FROM ANNOUNCEMENTS JOIN PLACES ON (ANNOUNCEMENTS.AREA_ID = PLACES.AREA_ID)")
         announcements = cursor.fetchall()
 
         connection.commit()
 
         return announcements
+
+def get_places():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT * FROM PLACES")
+        places = cursor.fetchall()
+
+        connection.commit()
+
+        return places
 
 
 @app.route('/init_announcements')
@@ -127,17 +172,21 @@ def init_announcements_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        query = """DROP TABLE IF EXISTS ANNOUNCEMENTS"""
+        query = """DROP TABLE IF EXISTS ANNOUNCEMENTS CASCADE"""
         cursor.execute(query)
 
         query = """CREATE TABLE ANNOUNCEMENTS (
         ID SERIAL NOT NULL,
         CONTENT VARCHAR(300),
-        PRIMARY KEY(ID)
+        AREA_ID SERIAL,
+        PRIMARY KEY(ID),
+        FOREIGN KEY(AREA_ID) REFERENCES PLACES(AREA_ID)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
         )"""
         cursor.execute(query)
 
-        query = """INSERT INTO ANNOUNCEMENTS (CONTENT) VALUES ('Sample announcement!')"""
+        query = """INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES ('Sample announcement!', 1)"""
         cursor.execute(query)
 
         connection.commit()
@@ -182,7 +231,109 @@ def init_hashtagContents_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+@app.route('/init_users')
+def init_user_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        query = """DROP TABLE IF EXISTS USERS"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE USERS(
+        ID SERIAL NOT NULL,
+        USERNAME VARCHAR(30),
+        PASSWORD VARCHAR(15),
+        MAIL_ID INTEGER,
+        ENTRY_ID INTEGER,
+        PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """ALTER TABLE USERS
+        ADD FOREIGN KEY(MAIL_ID)
+        REFERENCES MAILS(MAIL_ID)
+        ON DELETE CASCADE,
+        ADD FOREIGN KEY(ENTRY_ID)
+        REFERENCES ENTRIES(ENTRY_ID)
+        ON DELETE CASCADE"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO USERS (USERNAME,PASSWORD) VALUES ('EXAMPLE USER','123456')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
 
+@app.route('/init_mails')
+def init_mails_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS MAILS CASCADE"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE MAILS (
+        MAIL_ID SERIAL,
+        EMAIL VARCHAR(100),
+        PRIMARY KEY(MAIL_ID)
+        )"""
+        cursor.execute(query)
+
+        query = """INSERT INTO MAILS (EMAIL) VALUES ('example@example.com')"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+    
+@app.route('/init_entries')
+def init_entries_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS ENTRIES CASCADE"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE ENTRIES(
+        ENTRY_ID SERIAL,
+        ENTRY VARCHAR(300),
+        PRIMARY KEY(ENTRY_ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO ENTRIES (ENTRY) VALUES ('This is an entry')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
+@app.route('/init_topics')
+def init_topics_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS TOPICS CASCADE"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE TOPICS(
+        TOPIC_ID SERIAL,
+        TOPIC VARCHAR(40),
+        ENTRY_ID INTEGER,
+        PRIMARY KEY(TOPIC_ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """ALTER TABLE TOPICS
+        ADD FOREIGN KEY(ENTRY_ID)
+        REFERENCES ENTRIES(ENTRY_ID)
+        ON DELETE CASCADE"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO TOPICS (TOPIC) VALUES ('EXAMPLE TOPIC')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+        
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:

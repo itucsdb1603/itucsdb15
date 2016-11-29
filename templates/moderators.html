@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title %}Moderators{% endblock %}
+{% block title %}Moderators and ImagePosts{% endblock %}
 {% block content %}
     <h1>Moderators</h1>
 
@@ -20,11 +20,22 @@
     	<li><a href="{{ url_for('site.mod_add_page') }}">Add Moderator</a></li>
     	<li><a href="{{ url_for('site.mod_remove_page') }}">Delete Moderator</a></li>
     	<li><a href="{{ url_for('site.mod_update_page') }}">Update Moderator</a></li>
-    	<li>Nick Valensi</i>
-    	<li>Albert Hammond Jr.</li>
-    	<li>Nikolai Fraiture</li>
-    	<li>Fabrizio Moretti</li>
-
+    </ul>
+    <h2>Image Posts</h2>
+    {% if imgposts %}
+    <ul>
+    	{% for imgPost_id, imgpost in imgposts %}
+        <li>
+          {{ imgpost.imgname }}
+          {{ imgpost.modid }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <ul>
+		<li><a href="{{ url_for('site.imgpost_add_page') }}">Add Image Post</a></li>
+		<li><a href="{{ url_for('site.imgpost_remove_page') }}">Remove Image Post</a></li>
+		<li><a href="{{ url_for('site.imgpost_update_page') }}">Update Image Post</a></li>
     </ul>
 
 {% endblock %}

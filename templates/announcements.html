@@ -5,31 +5,49 @@
 
 <form action="/announcements" method="POST">
 	<h1> Add an announcement: </h1>
-	<input type="text" name="CONTENT" >
+	<input type="text" name="CONTENT" placeholder="Announcement text">
+	<input type="number" name="AREA_ID" placeholder="Area ID">
 	<input type="submit" name="add_announcement" value="Announce!" />
 
 	<br><br>
-	<table border="1px">
+	<table width="650">
 		<tr>
 			<th>ID</th>
 			<th>Content</th>
+			<th>Area</th>
 		</tr>
 		{% for announcement in announcements %}
 		<tr>
 			<td>{{announcement[0]}}</td>
 			<td>{{announcement[1]}}</td>
+			<td>{{announcement[2]}}</td>
 		</tr>
 		{% endfor %}
 	</table>
 
+	<br><br>
 	ID to delete: <input type="text" name="delete_id">
 	<input type="submit" name="delete_announcement" value="Delete Announcement">
 
-	<br><br>
+	<br>
 	ID to edit: <input type="text" name="edit_id">
 	<input type="submit" name="edit_announcement" value="Edit Announcement">
 
-	<br><br><br><br>
+	<br><br><br>
 	<input type="submit" name="init_announcements" value="INITIALIZE ANNOUNCEMENTS DATABASE!" />
+
+	<br><br>
+	<table width="600">
+	<tr>
+		<th>ID</th>
+		<th>Place</th>
+	</tr>
+	{% for place in places %}
+	<tr>
+		<td>{{place[0]}}</td>
+		<td>{{place[1]}}</td>
+	</tr>
+	{% endfor %}
+	</table>
 </form>
 {% endblock %}

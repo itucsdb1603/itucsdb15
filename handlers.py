@@ -10,12 +10,16 @@ from datetime import datetime
 from flask import current_app, request
 from moderator import Moderator
 from moderatorlist import ModeratorList
+from imgpost import ImgPost
+from imgpostlist import ImgPostList
 from hashtag import Hashtag
 from hashtags import Hashtags
 from hashtagContent import HashtagContent
 from hashtagContents import HashtagContents
 from event import Event
 from eventlist import EventList
+from place import Place
+from placelist import PlaceList
 from flask import current_app as app
 from _sqlite3 import Row
 
@@ -32,18 +36,24 @@ def home_page():
 def events_page():
     if request.method == 'GET':
         events = current_app.eventlist.get_events()
-        return render_template('events.html', events=sorted(events.items()))
+        places = current_app.placelist.get_places()
+        return render_template('events.html', events=sorted(events.items()), places=sorted(places.items()))
     else:
         content = str(request.form['content'])
+        place = str(request.form['option'])
         event_date = str(request.form['event_date'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
-            statement ="""INSERT INTO EVENTS (CONTENT, EVENT_DATE) VALUES (%s, %s)"""
-            cursor.execute(statement, (content, event_date))
+            statement = """SELECT AREA_ID, AREA FROM PLACES WHERE (AREA=(%s))"""
+            cursor.execute(statement, (place,))
+            connection.commit()
+            for row in cursor:
+                area_id, place = row
+            statement ="""INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES (%s, %s, %s)"""
+            cursor.execute(statement, (content, event_date, area_id,))
             connection.commit()
 
-            event = Event(content, event_date)
+            event = Event(content, event_date, place)
 
             current_app.eventlist.add_event(event)
             return redirect(url_for('site.events_page', event_id=event._id))
@@ -54,14 +64,58 @@ def delete_event():
     if request.method == 'GET':
         return render_template('delete_event.html')
     else:
-        id = str(request.form['event_id'])
+        content = str(request.form['content'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
+            statement ="""SELECT ID, CONTENT FROM EVENTS WHERE (CONTENT = (%s))"""
+            cursor.execute(statement, (content,))
+            connection.commit()
+            for row in cursor:
+                id, content = row
             statement ="""DELETE FROM EVENTS WHERE (ID = (%s))"""
             cursor.execute(statement, (id,))
             connection.commit()
             current_app.eventlist.delete_event(id)
             return redirect(url_for('site.events_page'))
+
+@site.route('/places', methods = ['GET', 'POST'])
+def places_page():
+    if request.method == 'GET':
+        places = current_app.placelist.get_places()
+        return render_template('places.html', places=sorted(places.items()))
+    else:
+        area = str(request.form['area'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            statement ="""INSERT INTO PLACES (AREA) VALUES (%s)"""
+            cursor.execute(statement, [area])
+            connection.commit()
+
+            place = Place(area)
+
+            current_app.placelist.add_place(place)
+            return redirect(url_for('site.places_page', place_id=place._id))
+
+
+@site.route('/places/delete', methods=['GET', 'POST'])
+def delete_place():
+    if request.method == 'GET':
+        return render_template('delete_place.html')
+    else:
+        area = str(request.form['area'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""SELECT AREA_ID, AREA FROM PLACES WHERE (AREA = (%s))"""
+            cursor.execute(statement, (area,))
+            connection.commit()
+            for row in cursor:
+                id, area = row
+            statement ="""DELETE FROM PLACES WHERE (AREA_ID = (%s))"""
+            cursor.execute(statement, (id,))
+            connection.commit()
+            current_app.placelist.delete_place(id)
+            return redirect(url_for('site.places_page'))
 
 @site.route('/signup')
 def signup_page():
@@ -221,6 +275,10 @@ def moderator_page(mod_id):
     moderator = current_app.moderatorlist.get_moderator(mod_id)
     return render_template('moderator.html', moderator=moderator)
 
+@site.route('/moderator/success')
+def success_page():
+    return render_template('success.html')
+
 @site.route('/moderators/add', methods=['GET', 'POST'])
 def mod_add_page():
     if request.method == 'GET':
@@ -240,6 +298,25 @@ def mod_add_page():
             current_app.moderatorlist.add_moderator(moderator)
             return redirect(url_for('site.moderator_page', mod_id=moderator._id))
 
+@site.route('/moderators/add_image_posts', methods=['GET', 'POST'])
+def imgpost_add_page():
+    if request.method == 'GET':
+        return render_template('imgpost_add.html')
+    else:
+        imgname = str(request.form['imgname'])
+        modid = int(request.form['modid'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+
+            statement ="""INSERT INTO IMGPOSTS (IMGNAME, MODID) VALUES (%s, %s)"""
+            cursor.execute(statement, (imgname, modid))
+            connection.commit()
+
+            imgPost = ImgPost(imgname, modid)
+
+            current_app.imgpostlist.add_imgPost(imgPost)
+            return redirect(url_for('site.success_page'))
+
 @site.route('/moderators/remove', methods=['GET', 'POST'])
 def mod_remove_page():
     if request.method == 'GET':
@@ -257,6 +334,25 @@ def mod_remove_page():
             cursor.execute(statement, (id,))
             connection.commit()
             current_app.moderatorlist.delete_moderator(id)
+            return redirect(url_for('site.moderators_page'))
+
+@site.route('/moderators/imgpost_remove', methods=['GET', 'POST'])
+def imgpost_remove_page():
+    if request.method == 'GET':
+        return render_template('imgpost_remove.html')
+    else:
+        imgname = str(request.form['imgname'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
+            cursor.execute(statement, (imgname,))
+            connection.commit()
+            for row in cursor:
+                id, nickname = row
+            statement ="""DELETE FROM IMGPOSTS WHERE (IMGID = (%s))"""
+            cursor.execute(statement, (id,))
+            connection.commit()
+            current_app.imgpostlist.delete_imgPost(id)
             return redirect(url_for('site.moderators_page'))
 
 @site.route('/moderators/update', methods=['GET', 'POST'])
@@ -284,10 +380,37 @@ def mod_update_page():
             moderatorToUpdate.change_nickname(newnickname)
             return redirect(url_for('site.moderators_page'))
 
+@site.route('/moderators/imgpost_update', methods=['GET', 'POST'])
+def imgpost_update_page():
+    if request.method == 'GET':
+        return render_template('imgpost_update.html')
+    else:
+        imgname = str(request.form['imgname'])
+        newimgname = str(request.form['newimgname'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement = """UPDATE IMGPOSTS
+            SET IMGNAME = (%s)
+            WHERE (IMGNAME = (%s))"""
+            cursor.execute(statement, (newimgname, imgname))
+            connection.commit()
+
+            cursor = connection.cursor()
+            statement = """SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
+            cursor.execute(statement, (newimgname,))
+            connection.commit()
+            for row in cursor:
+                id, nickname = row
+            postToUpdate = current_app.imgpostlist.get_imgPost(id)
+            postToUpdate.change_nickname(newimgname)
+            return redirect(url_for('site.moderators_page'))
+
 @site.route('/initmods')
 def init_mod_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
+        query = """DROP TABLE IF EXISTS IMGPOSTS"""
+        cursor.execute(query)
         query = """DROP TABLE IF EXISTS MODERATORS"""
         cursor.execute(query)
 
@@ -298,6 +421,18 @@ def init_mod_db():
         NATIONALITY VARCHAR(20),
         AGE INTEGER,
         PRIMARY KEY(ID)
+        )"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE IMGPOSTS (
+        IMGID SERIAL,
+        IMGNAME VARCHAR(20),
+        IMGTYPE VARCHAR(10),
+        PRIMARY KEY(IMGID),
+        MODID INTEGER,
+        FOREIGN KEY (MODID) REFERENCES MODERATORS (ID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE
         )"""
         cursor.execute(query)
 

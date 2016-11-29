@@ -6,12 +6,14 @@
     	<ul>
     	{% for event_id, event in events %}
         <li>
-          {{ event.content }}
-          {{ event.event_date }}
+          <b>Event Name: </b>{{ event.content }}
+          <b>Event Date: </b>{{ event.event_date }}
+          <b>Event Place: </b>{{ event.place }}
         </li>
         {% endfor %}
-    </ul>
+    	</ul>
     {% endif %}
+    
     <h4>Add an event</h4>
     <form role="form" action="" method="post" name="addevent"
             class="form-horizontal">
@@ -30,6 +32,16 @@
           </div>
         </div>
         <div class="form-group">
+          <label for="place" class="control-label col-sm-2">Event Place:</label>
+          <div class="col-sm-10">
+          <select name = "option" width="300px">
+            {% for place_id, place in places %}
+		          <option>{{ place.area }}</option>
+        	{% endfor %}
+        </select>
+          </div>
+        </div>
+        <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
             <button type="submit" name="save"
                     class="btn btn-primary">Save</button>
@@ -38,6 +50,8 @@
       </form>
 
 	<p>When adding an event date, please make sure it is in the form YYYYMMDD. A datepicker will be added later on.</p>
+	<p>If you don't see the city you will be holding the event in, go <a href="/places">here</a> to add it.</p>
+	
 	<a href="{{ url_for('site.delete_event') }}">Delete Event</a>
 	
     
