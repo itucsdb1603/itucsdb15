@@ -281,6 +281,34 @@ def init_entries_db():
         connection.commit()
         return redirect(url_for('site.home_page'))
 
+@app.route('/init_topics')
+def init_topics_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+        
+        query = """DROP TABLE IF EXISTS TOPICS CASCADE"""
+        cursor.execute(query)
+        
+        query = """CREATE TABLE TOPICS(
+        TOPIC_ID SERIAL,
+        TOPIC VARCHAR(40),
+        ENTRY_ID INTEGER,
+        PRIMARY KEY(TOPIC_ID)
+        )"""
+        cursor.execute(query)
+        
+        query = """ALTER TABLE TOPICS
+        ADD FOREIGN KEY(ENTRY_ID)
+        REFERENCES ENTRIES(ENTRY_ID)
+        ON DELETE CASCADE"""
+        cursor.execute(query)
+        
+        query = """INSERT INTO TOPICS (TOPIC) VALUES ('EXAMPLE TOPIC')"""
+        cursor.execute(query)
+        
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+        
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:
