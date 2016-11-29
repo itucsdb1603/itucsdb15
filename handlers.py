@@ -12,6 +12,8 @@ from moderator import Moderator
 from moderatorlist import ModeratorList
 from hashtag import Hashtag
 from hashtags import Hashtags
+from hashtagContent import HashtagContent
+from hashtagContents import HashtagContents
 from event import Event
 from eventlist import EventList
 from flask import current_app as app
@@ -60,7 +62,7 @@ def delete_event():
             connection.commit()
             current_app.eventlist.delete_event(id)
             return redirect(url_for('site.events_page'))
-        
+
 @site.route('/signup')
 def signup_page():
     return render_template('signup.html')
@@ -73,7 +75,8 @@ def hashtags_page():
 @site.route('/hashtag/<int:hashtag_id>')
 def hashtag_page(hashtag_id):
     hashtag = current_app.hashtags.get_hashtag(hashtag_id)
-    return render_template('hashtag.html', hashtag=hashtag)
+    hashtagContents = hashtag.hashtagContents.get_contents()
+    return render_template('hashtag.html', hashtag=hashtag, hashtagContents = sorted(hashtagContents.items()))
 
 @site.route('/hashtags/add', methods=['GET', 'POST'])
 def hashtag_add_page():
@@ -124,18 +127,89 @@ def hashtag_delete_page():
         return render_template('hashtag_delete.html')
     else:
         name = str(request.form['name'])
+        try:
+            with dbapi2.connect(app.config['dsn']) as connection:
+                cursor = connection.cursor()
+                statement ="""SELECT ID FROM HASHTAGS WHERE (NAME = (%s))"""
+                cursor.execute(statement, (name,))
+                connection.commit()
+                for id in cursor:
+                    statement ="""DELETE FROM HASHTAGS WHERE (ID = (%s))"""
+                    cursor.execute(statement, (id,))
+                    connection.commit()
+                    current_app.hashtags.delete_hashtag(id)
+
+        except dbapi2.DatabaseError:
+            connection.rollback()
+        finally:
+            connection.close()
+
+        return redirect(url_for('site.hashtags_page'))
+
+@site.route('/hashtag/<int:hashtag_id>/add', methods=['GET', 'POST'])
+def hashtagContent_add_page():
+    if request.method == 'GET':
+        return render_template('hashtagContent_add.html')
+    else:
+        content = str(request.form['content'])
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-            statement ="""SELECT ID FROM HASHTAGS WHERE (NAME = (%s))"""
-            cursor.execute(statement, (name,))
+
+            statement ="""INSERT INTO HASHTAGCONTENTS (HASHTAGID, CONTENT) VALUES (%s, %s)"""
+            cursor.execute(statement, (content, hashtag_id))
             connection.commit()
+
+            hashtagContent = HashtagContent(content)
+            hashtag = current_app.hashtags.get_hashtag(hashtag_id)
+            current_app.hashtag.hashtagContents.add_content(hashtagContent)
+            return redirect(url_for('site.hashtag_page', hashtag_id=hashtag._id))
+
+@site.route('/hashtag/<int:hashtag_id>/update', methods=['GET', 'POST'])
+def hashtagContent_update_page():
+    if request.method == 'GET':
+        return render_template('hashtagContent_update.html')
+    else:
+        contentid = str(request.form['id'])
+        newContent = str(request.form['newContent'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement = """UPDATE HASHTAGCONTENTS
+            SET CONTENT = (%s)
+            WHERE (ID = (%s) AND HASHTAGID = (%s))"""
+            cursor.execute(statement, (newContent, contentid, hashtag_id))
+            connection.commit()
+
+            cursor = connection.cursor()
+            statement = """SELECT ID, CONTENT FROM HASHTAGCONTENTS WHERE (ID = (%s) AND HASHTAGID = (%s))"""
+            cursor.execute(statement, (contentid, hashtag_id))
+            connection.commit()
+            hashtag = current_app.hashtags.get_hashtag(hashtag_id)
             for row in cursor:
-                id = row
-            statement ="""DELETE FROM HASHTAGS WHERE (ID = (%s))"""
-            cursor.execute(statement, (id,))
-            connection.commit()
-            current_app.hashtags.delete_hashtag(id)
-            return redirect(url_for('site.hashtags_page'))
+                id, content = row
+                contentToBeUpdated = current_app.hashtag.hashtagContents.get_content(id)
+                contentToBeUpdated.update_content(newContent)
+            return redirect(url_for('site.hashtag_page', hashtag_id=hashtag._id))
+
+@site.route('/hashtag/<int:hashtag_id>/remove', methods=['GET', 'POST'])
+def hashtagContent_delete_page():
+    if request.method == 'GET':
+        return render_template('hashtagContent_delete.html')
+    else:
+        contentid = str(request.form['id'])
+        try:
+            with dbapi2.connect(app.config['dsn']) as connection:
+                cursor = connection.cursor()
+                statement ="""DELETE FROM HASHTAGCONTENTS WHERE (ID = (%s) AND HASHTAGID = (%s))"""
+                cursor.execute(statement, (contentid, hashtag_id))
+                connection.commit()
+                hashtag = current_app.hashtags.get_hashtag(hashtag_id)
+                current_app.hashtag.hashtagContents.delete_content(contentid)
+
+        except dbapi2.DatabaseError:
+            connection.rollback()
+        finally:
+            connection.close()
+        return redirect(url_for('site.hashtag_page', hashtag_id=hashtag._id))
 
 @site.route('/moderators')
 def moderators_page():

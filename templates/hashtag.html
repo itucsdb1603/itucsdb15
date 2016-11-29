@@ -2,4 +2,20 @@
 {% block title %}Hashtag{% endblock %}
 {% block content %}
     <h1>{{ hashtag.name }}</h1>
+    <ul>
+		<a href="{{ url_for('site.hashtagContent_add_page') }}">Add Content</a>
+		<a href="{{ url_for('site.hashtagContent_update_page') }}">Update Content</a>
+		<a href="{{ url_for('site.hashtagContent_delete_page') }}">Delete Content</a>
+	</ul>
+	{% if hashtagContents %}
+    <ul>
+    	{% for hashtagContent_id, hashtagContent in hashtagContents %}
+        <li>
+        <a>
+          {{ hashtagContent.content}}
+         </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 {% endblock %}

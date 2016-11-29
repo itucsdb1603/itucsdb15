@@ -12,6 +12,9 @@ from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
 from hashtags import Hashtags
+from hashtag import Hashtag
+from hashtagContent import HashtagContent
+from hashtagContents import HashtagContents
 from event import Event
 from eventlist import EventList
 
@@ -20,6 +23,7 @@ def create_app():
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
     app.hashtags = Hashtags()
+    app.hashtagContents = HashtagContents()
     app.eventlist = EventList()
     return app
 app = create_app()
@@ -144,7 +148,7 @@ def init_hashtag_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
 
-        query = """DROP TABLE IF EXISTS HASHTAGS"""
+        query = """DROP TABLE IF EXISTS HASHTAGS CASCADE"""
         cursor.execute(query)
 
         query = """CREATE TABLE HASHTAGS (
@@ -154,7 +158,26 @@ def init_hashtag_db():
         )"""
         cursor.execute(query)
 
-        query = """INSERT INTO HASHTAGS (NAME) VALUES ('#BazenHayat')"""
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
+@app.route('/init_hashtagContents')
+def init_hashtagContents_db():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS HASHTAGCONTENTS"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE HASHTAGCONTENTS (
+        HASHTAGID INTEGER,
+        ID SERIAL NOT NULL,
+        CONTENT VARCHAR(300),
+        PRIMARY KEY(HASHTAGID, ID),
+        FOREIGN KEY(HASHTAGID)
+        REFERENCES HASHTAGS(ID)
+        ON DELETE CASCADE
+        )"""
         cursor.execute(query)
 
         connection.commit()
