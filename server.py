@@ -11,6 +11,7 @@ from flask import request
 from handlers import site
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
+from imgpostlist import ImgPostList
 from hashtags import Hashtags
 from event import Event
 from eventlist import EventList
@@ -21,6 +22,7 @@ def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.moderatorlist = ModeratorList()
+    app.imgpostlist = ImgPostList()
     app.hashtags = Hashtags()
     app.eventlist = EventList()
     app.placelist = PlaceList()
@@ -58,13 +60,13 @@ def init_events_db():
         REFERENCES PLACES(AREA_ID)
         ON DELETE CASCADE"""
         cursor.execute(query)
-        
+
         query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES ('Holi Festival', '20161030', 1)"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/initplaces')
 def init_places_db():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -185,7 +187,7 @@ def init_announcements_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/init_hashtags')
 def init_hashtag_db():
     with dbapi2.connect(app.config['dsn']) as connection:
