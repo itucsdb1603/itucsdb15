@@ -65,10 +65,6 @@ def init_events_db():
         ON DELETE CASCADE"""
         cursor.execute(query)
 
-        query = """INSERT INTO EVENTS (CONTENT, EVENT_DATE, AREA_ID) VALUES ('Holi Festival', '20161030', 1)"""
-        cursor.execute(query)
-
-        connection.commit()
         return redirect(url_for('site.home_page'))
 
 @app.route('/initplaces')
@@ -86,10 +82,6 @@ def init_places_db():
         )"""
         cursor.execute(query)
 
-        query = """INSERT INTO PLACES (AREA) VALUES ('New Delhi')"""
-        cursor.execute(query)
-
-        connection.commit()
         return redirect(url_for('site.home_page'))
 
 @app.route('/announcements',  methods=['GET', 'POST'])
