@@ -78,6 +78,46 @@ def delete_event():
             current_app.eventlist.delete_event(id)
             return redirect(url_for('site.events_page'))
 
+@site.route('/events/update', methods = ['GET', 'POST'])
+def update_event():
+    if request.method == 'GET':
+        events = current_app.eventlist.get_events()
+        places = current_app.placelist.get_places()
+        return render_template('update_event.html', events=sorted(events.items()), places=sorted(places.items()))
+    else:
+        content = str(request.form['content'])
+        new_content = str(request.form['new_content'])
+        new_place = str(request.form['option'])
+        new_date = str(request.form['new_date'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement = """SELECT AREA_ID, AREA FROM PLACES WHERE (AREA=(%s))"""
+            cursor.execute(statement, (new_place,))
+            connection.commit()
+            for row in cursor:
+                area_id, place = row
+                
+            cursor = connection.cursor()
+            statement = """UPDATE EVENTS
+            SET CONTENT = (%s),
+            EVENT_DATE = (%s),
+            AREA_ID = (%s)
+            WHERE (CONTENT=(%s))"""
+            cursor.execute(statement, (new_content, new_date, area_id, content))
+            connection.commit()
+            
+            cursor = connection.cursor()
+            statement = """SELECT ID, CONTENT FROM EVENTS WHERE (CONTENT = (%s))"""
+            cursor.execute(statement, (new_content,))
+            connection.commit()
+            for row in cursor:
+                id, content = row
+          
+            updated_event = current_app.eventlist.get_event(id)
+            updated_event.update_event(new_content, new_place, new_date)
+            return redirect(url_for('site.events_page'))
+
+
 @site.route('/places', methods = ['GET', 'POST'])
 def places_page():
     if request.method == 'GET':
