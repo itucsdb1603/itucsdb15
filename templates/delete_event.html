@@ -1,18 +1,24 @@
 {% extends "layout.html" %}
 {% block title %}Events{% endblock %}
 {% block content %}
-	<h1>Events</h1>
+
 	{% if events %}
-    	<ul>
-    	{% for event_id, event in events %}
-        <li>
-        
-          {{ event.content }}
-          {{ event.event_date }}
-        </li>
+		<h1>Events</h1>
+		<table>
+			<tr>
+				<th><b>Event Name: </b></th>
+				<th><b>Event Date: </b></th>
+				<th><b>Event Place: </b></th>
+			</tr>
+		{% for event_id, event in events %}
+        	<tr>
+		        <td>{{ event.content }}</td>
+		        <td>{{ event.event_date }}</td>
+		        <td>{{ event.place }}</td>
+        	</tr>
         {% endfor %}
-    </ul>
-    {% endif %}
+		<table>
+	{% endif %}
     
     <h4>Delete an event</h4>
     <form role="form" action="" method="post" name="deleteevent"

@@ -3,16 +3,21 @@
 {% block content %}
 	{% if events %}
 	<h1>Events</h1>
-    	<ul>
-    	{% for event_id, event in events %}
-        <li>
-          <b>Event Name: </b>{{ event.content }}
-          <b>Event Date: </b>{{ event.event_date }}
-          <b>Event Place: </b>{{ event.place }}
-        </li>
-        {% endfor %}
-    	</ul>
-    {% endif %}
+			<table id="events">
+				<tr id="events-header">
+					<th class="events-header-element"><b>Event Name: </b></th>
+					<th class="events-header-element"><b>Event Date: </b></th>
+					<th class="events-header-element"><b>Event Place: </b></th>
+				</tr>
+			{% for event_id, event in events %}
+	        	<tr id="events-content">
+			        <td class="events-content-element">{{ event.content }}</td>
+			        <td class="events-content-element">{{ event.event_date }}</td>
+			        <td class="events-content-element">{{ event.place }}</td>
+	        	</tr>
+	        {% endfor %}
+			<table>
+	{% endif %}
     
     <h4>Add an event</h4>
     <form role="form" action="" method="post" name="addevent"

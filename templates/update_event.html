@@ -1,19 +1,25 @@
 {% extends "layout.html" %}
 {% block title %}Events{% endblock %}
 {% block content %}
+
 	{% if events %}
 	<h1>Events</h1>
-    	<ul>
-    	{% for event_id, event in events %}
-        <li>
-          <b>Event Name: </b>{{ event.content }}
-          <b>Event Date: </b>{{ event.event_date }}
-          <b>Event Place: </b>{{ event.place }}
-        </li>
+		<table>
+			<tr>
+				<th><b>Event Name: </b></th>
+				<th><b>Event Date: </b></th>
+				<th><b>Event Place: </b></th>
+			</tr>
+		{% for event_id, event in events %}
+        	<tr>
+		        <td>{{ event.content }}</td>
+		        <td>{{ event.event_date }}</td>
+		        <td>{{ event.place }}</td>
+        	</tr>
         {% endfor %}
-    	</ul>
-    {% endif %}
-    
+		<table>
+	{% endif %}
+	
     <h4>Update an event</h4>
     <form role="form" action="" method="post" name="updateevent"
             class="form-horizontal">

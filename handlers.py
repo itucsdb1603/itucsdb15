@@ -155,8 +155,34 @@ def delete_place():
             cursor.execute(statement, (id,))
             connection.commit()
             current_app.placelist.delete_place(id)
-            return redirect(url_for('site.places_page'))
+            return redirect(url_for('site.places_page'), place_id=place._id)
 
+@site.route('/places/update', methods=['GET', 'POST'])
+def update_place():
+    if request.method == 'GET':
+        return render_template('update_place.html')
+    else:
+        area= str(request.form['area'])
+        new_area = str(request.form['new_area'])
+        with dbapi2.connect(app.config['dsn']) as connection:
+            cursor = connection.cursor()
+            statement ="""UPDATE PLACES
+            SET AREA = (%s)
+            WHERE AREA = (%s)"""
+            cursor.execute(statement, (new_area, area,))
+            connection.commit()
+            
+            cursor = connection.cursor()
+            statement = """SELECT AREA_ID, AREA FROM PLACES WHERE (AREA = (%s))"""
+            cursor.execute(statement, (new_area,))
+            connection.commit()
+            for row in cursor:
+                area_id, area = row
+            
+            updated_place = current_app.placelist.get_place(area_id)
+            updated_place.update_place(new_area)
+            return redirect(url_for('site.places_page'), place_id=place._id)
+        
 @site.route('/signup')
 def signup_page():
     return render_template('signup.html')
