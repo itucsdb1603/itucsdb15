@@ -26,19 +26,10 @@ def imgpost_add_page():
     else:
         imgname = str(request.form['imgname'])
         modid = int(request.form['modid'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-
-            statement ="""INSERT INTO IMGPOSTS (IMGNAME, MODID) VALUES (%s, %s)"""
-            cursor.execute(statement, (imgname, modid))
-            connection.commit()
-
-            imgPost = ImgPost(imgname, modid)
-
-            current_app.imgpostlist.add_imgPost(imgPost)
-            return redirect(url_for('imgPosts.success_page'))
-
-
+        imgPost = ImgPost(imgname, modid)
+        current_app.imgpostlist.add_imgPost(imgPost)
+        imgid = current_app.imgpostlist.get_imgPost(imgname)
+        return redirect(url_for('imgPosts.success_page'))
 
 @imgPosts.route('/moderators/imgpost_remove', methods=['GET', 'POST'])
 def imgpost_remove_page():
@@ -46,18 +37,9 @@ def imgpost_remove_page():
         return render_template('imgpost_remove.html')
     else:
         imgname = str(request.form['imgname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement ="""SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (imgname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            statement ="""DELETE FROM IMGPOSTS WHERE (IMGID = (%s))"""
-            cursor.execute(statement, (id,))
-            connection.commit()
-            current_app.imgpostlist.delete_imgPost(id)
-            return redirect(url_for('mods.moderators_page'))
+        imgid = current_app.imgpostlist.get_imgPost(imgname)
+        current_app.imgpostlist.delete_imgPost(imgid)
+        return redirect(url_for('imgPosts.success_page'))
 
 
 
@@ -68,21 +50,7 @@ def imgpost_update_page():
     else:
         imgname = str(request.form['imgname'])
         newimgname = str(request.form['newimgname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement = """UPDATE IMGPOSTS
-            SET IMGNAME = (%s)
-            WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (newimgname, imgname))
-            connection.commit()
-
-            cursor = connection.cursor()
-            statement = """SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (newimgname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            postToUpdate = current_app.imgpostlist.get_imgPost(id)
-            postToUpdate.change_nickname(newimgname)
-            return redirect(url_for('mods.moderators_page'))
+        imgid = current_app.imgpostlist.get_imgPost(imgname) # to be updated
+        current_app.imgpostlist.update_imgPost(imgid, newimgname)
+        return redirect(url_for('imgPosts.success_page'))
 

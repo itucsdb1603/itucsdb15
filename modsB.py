@@ -17,12 +17,7 @@ mods = Blueprint('mods', __name__)
 @mods.route('/moderators')
 def moderators_page():
     moderators = current_app.moderatorlist.get_moderators()
-    return render_template('moderators.html', moderators=sorted(moderators.items()))
-
-@mods.route('/moderator/<int:mod_id>')
-def moderator_page(mod_id):
-    moderator = current_app.moderatorlist.get_moderator(mod_id)
-    return render_template('moderator.html', moderator=moderator)
+    return render_template('moderators.html', moderators=moderators)
 
 @mods.route('/moderators/add', methods=['GET', 'POST'])
 def mod_add_page():
@@ -31,17 +26,10 @@ def mod_add_page():
     else:
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-
-            statement ="""INSERT INTO MODERATORS (NICKNAME, PASSWORD) VALUES (%s, %s)"""
-            cursor.execute(statement, (nickname, password))
-            connection.commit()
-
-            moderator = Moderator(nickname, password)
-
-            current_app.moderatorlist.add_moderator(moderator)
-            return redirect(url_for('mods.moderator_page', mod_id=moderator._id))
+        moderator = Moderator(nickname, password)
+        current_app.moderatorlist.add_moderator(moderator)
+        modid = current_app.moderatorlist.get_moderator(moderator.nickname)
+        return redirect(url_for('mods.moderators_page'))
 
 @mods.route('/moderators/remove', methods=['GET', 'POST'])
 def mod_remove_page():
@@ -49,18 +37,9 @@ def mod_remove_page():
         return render_template('modremove.html')
     else:
         nickname = str(request.form['nickname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement ="""SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (nickname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            statement ="""DELETE FROM MODERATORS WHERE (ID = (%s))"""
-            cursor.execute(statement, (id,))
-            connection.commit()
-            current_app.moderatorlist.delete_moderator(id)
-            return redirect(url_for('mods.moderators_page'))
+        mod_id = current_app.moderatorlist.get_moderator(nickname)
+        current_app.moderatorlist.delete_moderator(mod_id)
+        return redirect(url_for('mods.moderators_page'))
 
 @mods.route('/moderators/update', methods=['GET', 'POST'])
 def mod_update_page():
@@ -69,23 +48,9 @@ def mod_update_page():
     else:
         nickname = str(request.form['nickname'])
         newnickname = str(request.form['newnickname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement = """UPDATE MODERATORS
-            SET NICKNAME = (%s)
-            WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (newnickname, nickname))
-            connection.commit()
-
-            cursor = connection.cursor()
-            statement = """SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (newnickname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            moderatorToUpdate = current_app.moderatorlist.get_moderator(id)
-            moderatorToUpdate.change_nickname(newnickname)
-            return redirect(url_for('mods.moderators_page'))
+        mod_id = current_app.moderatorlist.get_moderator(nickname)
+        current_app.moderatorlist.update_moderator(mod_id, newnickname)
+        return redirect(url_for('mods.moderators_page'))
 
 @mods.route('/initmods')
 def init_mod_db():

@@ -7,10 +7,8 @@
     <ul>
     	{% for mod_id, moderator in moderators %}
         <li>
-        <a href="{{ url_for('mods.moderator_page', mod_id=mod_id) }}">
+          {{ mod_id }}
           {{ moderator.nickname }}
-          {{ moderator.password }}
-         </a>
         </li>
         {% endfor %}
     </ul>
@@ -26,6 +24,7 @@
     <ul>
     	{% for imgPost_id, imgpost in imgposts %}
         <li>
+          {{ imgPost_id }}
           {{ imgpost.imgname }}
           {{ imgpost.modid }}
         </li>
