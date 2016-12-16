@@ -7,7 +7,7 @@
     <ul>
     	{% for mod_id, moderator in moderators %}
         <li>
-        <a href="{{ url_for('site.moderator_page', mod_id=mod_id) }}">
+        <a href="{{ url_for('mods.moderator_page', mod_id=mod_id) }}">
           {{ moderator.nickname }}
           {{ moderator.password }}
          </a>
@@ -17,9 +17,9 @@
     {% endif %}
 
     <ul>
-    	<li><a href="{{ url_for('site.mod_add_page') }}">Add Moderator</a></li>
-    	<li><a href="{{ url_for('site.mod_remove_page') }}">Delete Moderator</a></li>
-    	<li><a href="{{ url_for('site.mod_update_page') }}">Update Moderator</a></li>
+    	<li><a href="{{ url_for('mods.mod_add_page') }}">Add Moderator</a></li>
+    	<li><a href="{{ url_for('mods.mod_remove_page') }}">Delete Moderator</a></li>
+    	<li><a href="{{ url_for('mods.mod_update_page') }}">Update Moderator</a></li>
     </ul>
     <h2>Image Posts</h2>
     {% if imgposts %}
@@ -33,9 +33,9 @@
     </ul>
     {% endif %}
     <ul>
-		<li><a href="{{ url_for('site.imgpost_add_page') }}">Add Image Post</a></li>
-		<li><a href="{{ url_for('site.imgpost_remove_page') }}">Remove Image Post</a></li>
-		<li><a href="{{ url_for('site.imgpost_update_page') }}">Update Image Post</a></li>
+		<li><a href="{{ url_for('imgPosts.imgpost_add_page') }}">Add Image Post</a></li>
+		<li><a href="{{ url_for('imgPosts.imgpost_remove_page') }}">Remove Image Post</a></li>
+		<li><a href="{{ url_for('imgPosts.imgpost_update_page') }}">Update Image Post</a></li>
     </ul>
 
 {% endblock %}

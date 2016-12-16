@@ -8,10 +8,6 @@ from flask import redirect
 from flask.helpers import url_for
 from datetime import datetime
 from flask import current_app, request
-from moderator import Moderator
-from moderatorlist import ModeratorList
-from imgpost import ImgPost
-from imgpostlist import ImgPostList
 from hashtag import Hashtag
 from hashtags import Hashtags
 from hashtagContent import HashtagContent
@@ -24,7 +20,6 @@ from flask import current_app as app
 from _sqlite3 import Row
 
 site = Blueprint('site', __name__)
-
 
 @site.route('/')
 def home_page():
@@ -96,7 +91,7 @@ def update_event():
             connection.commit()
             for row in cursor:
                 area_id, place = row
-                
+
             cursor = connection.cursor()
             statement = """UPDATE EVENTS
             SET CONTENT = (%s),
@@ -105,14 +100,14 @@ def update_event():
             WHERE (CONTENT=(%s))"""
             cursor.execute(statement, (new_content, new_date, area_id, content))
             connection.commit()
-            
+
             cursor = connection.cursor()
             statement = """SELECT ID, CONTENT FROM EVENTS WHERE (CONTENT = (%s))"""
             cursor.execute(statement, (new_content,))
             connection.commit()
             for row in cursor:
                 id, content = row
-          
+
             updated_event = current_app.eventlist.get_event(id)
             updated_event.update_event(new_content, new_place, new_date)
             return redirect(url_for('site.events_page'))
@@ -171,18 +166,18 @@ def update_place():
             WHERE AREA = (%s)"""
             cursor.execute(statement, (new_area, area,))
             connection.commit()
-            
+
             cursor = connection.cursor()
             statement = """SELECT AREA_ID, AREA FROM PLACES WHERE (AREA = (%s))"""
             cursor.execute(statement, (new_area,))
             connection.commit()
             for row in cursor:
                 area_id, area = row
-            
+
             updated_place = current_app.placelist.get_place(area_id)
             updated_place.update_place(new_area)
             return redirect(url_for('site.places_page'), place_id=place._id)
-        
+
 @site.route('/signup')
 def signup_page():
     return render_template('signup.html')
@@ -331,176 +326,3 @@ def hashtagContent_delete_page():
             connection.close()
         return redirect(url_for('site.hashtag_page', hashtag_id=hashtag._id))
 
-@site.route('/moderators')
-def moderators_page():
-    moderators = current_app.moderatorlist.get_moderators()
-    return render_template('moderators.html', moderators=sorted(moderators.items()))
-
-@site.route('/moderator/<int:mod_id>')
-def moderator_page(mod_id):
-    moderator = current_app.moderatorlist.get_moderator(mod_id)
-    return render_template('moderator.html', moderator=moderator)
-
-@site.route('/moderator/success')
-def success_page():
-    return render_template('success.html')
-
-@site.route('/moderators/add', methods=['GET', 'POST'])
-def mod_add_page():
-    if request.method == 'GET':
-        return render_template('modedit.html')
-    else:
-        nickname = str(request.form['nickname'])
-        password = str(request.form['password'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-
-            statement ="""INSERT INTO MODERATORS (NICKNAME, PASSWORD) VALUES (%s, %s)"""
-            cursor.execute(statement, (nickname, password))
-            connection.commit()
-
-            moderator = Moderator(nickname, password)
-
-            current_app.moderatorlist.add_moderator(moderator)
-            return redirect(url_for('site.moderator_page', mod_id=moderator._id))
-
-@site.route('/moderators/add_image_posts', methods=['GET', 'POST'])
-def imgpost_add_page():
-    if request.method == 'GET':
-        return render_template('imgpost_add.html')
-    else:
-        imgname = str(request.form['imgname'])
-        modid = int(request.form['modid'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-
-            statement ="""INSERT INTO IMGPOSTS (IMGNAME, MODID) VALUES (%s, %s)"""
-            cursor.execute(statement, (imgname, modid))
-            connection.commit()
-
-            imgPost = ImgPost(imgname, modid)
-
-            current_app.imgpostlist.add_imgPost(imgPost)
-            return redirect(url_for('site.success_page'))
-
-@site.route('/moderators/remove', methods=['GET', 'POST'])
-def mod_remove_page():
-    if request.method == 'GET':
-        return render_template('modremove.html')
-    else:
-        nickname = str(request.form['nickname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement ="""SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (nickname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            statement ="""DELETE FROM MODERATORS WHERE (ID = (%s))"""
-            cursor.execute(statement, (id,))
-            connection.commit()
-            current_app.moderatorlist.delete_moderator(id)
-            return redirect(url_for('site.moderators_page'))
-
-@site.route('/moderators/imgpost_remove', methods=['GET', 'POST'])
-def imgpost_remove_page():
-    if request.method == 'GET':
-        return render_template('imgpost_remove.html')
-    else:
-        imgname = str(request.form['imgname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement ="""SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (imgname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            statement ="""DELETE FROM IMGPOSTS WHERE (IMGID = (%s))"""
-            cursor.execute(statement, (id,))
-            connection.commit()
-            current_app.imgpostlist.delete_imgPost(id)
-            return redirect(url_for('site.moderators_page'))
-
-@site.route('/moderators/update', methods=['GET', 'POST'])
-def mod_update_page():
-    if request.method == 'GET':
-        return render_template('modupdate.html')
-    else:
-        nickname = str(request.form['nickname'])
-        newnickname = str(request.form['newnickname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement = """UPDATE MODERATORS
-            SET NICKNAME = (%s)
-            WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (newnickname, nickname))
-            connection.commit()
-
-            cursor = connection.cursor()
-            statement = """SELECT ID, NICKNAME FROM MODERATORS WHERE (NICKNAME = (%s))"""
-            cursor.execute(statement, (newnickname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            moderatorToUpdate = current_app.moderatorlist.get_moderator(id)
-            moderatorToUpdate.change_nickname(newnickname)
-            return redirect(url_for('site.moderators_page'))
-
-@site.route('/moderators/imgpost_update', methods=['GET', 'POST'])
-def imgpost_update_page():
-    if request.method == 'GET':
-        return render_template('imgpost_update.html')
-    else:
-        imgname = str(request.form['imgname'])
-        newimgname = str(request.form['newimgname'])
-        with dbapi2.connect(app.config['dsn']) as connection:
-            cursor = connection.cursor()
-            statement = """UPDATE IMGPOSTS
-            SET IMGNAME = (%s)
-            WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (newimgname, imgname))
-            connection.commit()
-
-            cursor = connection.cursor()
-            statement = """SELECT IMGID, IMGNAME FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
-            cursor.execute(statement, (newimgname,))
-            connection.commit()
-            for row in cursor:
-                id, nickname = row
-            postToUpdate = current_app.imgpostlist.get_imgPost(id)
-            postToUpdate.change_nickname(newimgname)
-            return redirect(url_for('site.moderators_page'))
-
-@site.route('/initmods')
-def init_mod_db():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
-        query = """DROP TABLE IF EXISTS IMGPOSTS"""
-        cursor.execute(query)
-        query = """DROP TABLE IF EXISTS MODERATORS"""
-        cursor.execute(query)
-
-        query = """CREATE TABLE MODERATORS (
-        ID SERIAL,
-        NICKNAME VARCHAR(20) NOT NULL,
-        PASSWORD VARCHAR(20),
-        NATIONALITY VARCHAR(20),
-        AGE INTEGER,
-        PRIMARY KEY(ID)
-        )"""
-        cursor.execute(query)
-
-        query = """CREATE TABLE IMGPOSTS (
-        IMGID SERIAL,
-        IMGNAME VARCHAR(20),
-        IMGTYPE VARCHAR(10),
-        PRIMARY KEY(IMGID),
-        MODID INTEGER,
-        FOREIGN KEY (MODID) REFERENCES MODERATORS (ID)
-            ON DELETE RESTRICT
-            ON UPDATE CASCADE
-        )"""
-        cursor.execute(query)
-
-        connection.commit()
-        return redirect(url_for('site.home_page'))

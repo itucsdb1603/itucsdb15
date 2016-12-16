@@ -9,6 +9,8 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from handlers import site
+from modsB import mods
+from imgPostsB import imgPosts
 from flask.helpers import url_for
 from moderatorlist import ModeratorList
 from imgpostlist import ImgPostList
@@ -24,6 +26,8 @@ from placelist import PlaceList
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
+    app.register_blueprint(mods)
+    app.register_blueprint(imgPosts)
     app.moderatorlist = ModeratorList()
     app.imgpostlist = ImgPostList()
     app.hashtags = Hashtags()
@@ -223,14 +227,14 @@ def init_hashtagContents_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/init_users')
 def init_user_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
         query = """DROP TABLE IF EXISTS USERS"""
         cursor.execute(query)
-        
+
         query = """CREATE TABLE USERS(
         ID SERIAL NOT NULL,
         USERNAME VARCHAR(30),
@@ -240,7 +244,7 @@ def init_user_db():
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
-        
+
         query = """ALTER TABLE USERS
         ADD FOREIGN KEY(MAIL_ID)
         REFERENCES MAILS(MAIL_ID)
@@ -249,10 +253,10 @@ def init_user_db():
         REFERENCES ENTRIES(ENTRY_ID)
         ON DELETE CASCADE"""
         cursor.execute(query)
-        
+
         query = """INSERT INTO USERS (USERNAME,PASSWORD) VALUES ('EXAMPLE USER','123456')"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
 
@@ -276,25 +280,25 @@ def init_mails_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/init_entries')
 def init_entries_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
-        
+
         query = """DROP TABLE IF EXISTS ENTRIES CASCADE"""
         cursor.execute(query)
-        
+
         query = """CREATE TABLE ENTRIES(
         ENTRY_ID SERIAL,
         ENTRY VARCHAR(300),
         PRIMARY KEY(ENTRY_ID)
         )"""
         cursor.execute(query)
-        
+
         query = """INSERT INTO ENTRIES (ENTRY) VALUES ('This is an entry')"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
 
@@ -302,10 +306,10 @@ def init_entries_db():
 def init_topics_db():
     with dbapi2.connect(app.config['dsn']) as connection:
         cursor = connection.cursor()
-        
+
         query = """DROP TABLE IF EXISTS TOPICS CASCADE"""
         cursor.execute(query)
-        
+
         query = """CREATE TABLE TOPICS(
         TOPIC_ID SERIAL,
         TOPIC VARCHAR(40),
@@ -313,19 +317,19 @@ def init_topics_db():
         PRIMARY KEY(TOPIC_ID)
         )"""
         cursor.execute(query)
-        
+
         query = """ALTER TABLE TOPICS
         ADD FOREIGN KEY(ENTRY_ID)
         REFERENCES ENTRIES(ENTRY_ID)
         ON DELETE CASCADE"""
         cursor.execute(query)
-        
+
         query = """INSERT INTO TOPICS (TOPIC) VALUES ('EXAMPLE TOPIC')"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
-        
+
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:
