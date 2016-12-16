@@ -18,6 +18,7 @@ from place import Place
 from placelist import PlaceList
 from flask import current_app as app
 from _sqlite3 import Row
+#from flask.ext.login import LoginManager
 
 site = Blueprint('site', __name__)
 
