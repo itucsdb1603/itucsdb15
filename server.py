@@ -4,7 +4,7 @@ import json
 import re
 import psycopg2 as dbapi2
 
-from flask import Flask
+from flask import Flask, current_app
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -24,6 +24,7 @@ from place import Place
 from placelist import PlaceList
 from placesB import places
 from eventsB import events
+import placesB
 
 def create_app():
     app = Flask(__name__)
@@ -125,11 +126,12 @@ def announcements_page():
             connection.commit()
 
     allAnnouncements = get_announcements()
-    allPlaces = get_places()
+    allPlaces = current_app.placelist.get_places()
     return render_template('announcements.html', announcements = allAnnouncements, places = allPlaces)
 
 def get_announcements():
     with dbapi2.connect(app.config['dsn']) as connection:
+        import placesB
         cursor = connection.cursor()
 
         cursor.execute("SELECT ID, CONTENT, AREA FROM ANNOUNCEMENTS JOIN PLACES ON (ANNOUNCEMENTS.AREA_ID = PLACES.AREA_ID)")
