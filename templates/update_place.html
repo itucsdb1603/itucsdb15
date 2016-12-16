@@ -12,8 +12,8 @@
     </ul>
     {% endif %}
     
-    <h4>Delete a place</h4>
-    <form role="form" action="" method="post" name="deleteplace"
+    <h4>Update a place</h4>
+    <form role="form" action="" method="post" name="updateplace"
             class="form-horizontal">
 
         <div class="form-group">
@@ -24,13 +24,18 @@
         </div>
 
         <div class="form-group">
+          <label for="title" class="control-label col-sm-2">Updated Place Name:</label>
+          <div class="col-sm-10">
+            <input type="text" name="new_area" required autofocus />
+          </div>
+        </div>
+        
+        <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" name="delete"
-                    class="btn btn-danger">Delete</button>
+            <button type="submit" name="update"
+                    class="btn btn-success">Update</button>
           </div>
         </div>
       </form>
-    
-    <a href="{{ url_for('places.update_place') }}">Update Place</a>
     
 {% endblock %}

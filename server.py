@@ -22,12 +22,16 @@ from event import Event
 from eventlist import EventList
 from place import Place
 from placelist import PlaceList
+from placesB import places
+from eventsB import events
 
 def create_app():
     app = Flask(__name__)
     app.register_blueprint(site)
     app.register_blueprint(mods)
     app.register_blueprint(imgPosts)
+    app.register_blueprint(places)
+    app.register_blueprint(events)
     app.moderatorlist = ModeratorList()
     app.imgpostlist = ImgPostList()
     app.hashtags = Hashtags()
@@ -71,22 +75,6 @@ def init_events_db():
 
         return redirect(url_for('site.home_page'))
 
-@app.route('/initplaces')
-def init_places_db():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
-
-        query = """DROP TABLE IF EXISTS PLACES CASCADE"""
-        cursor.execute(query)
-
-        query = """CREATE TABLE PLACES (
-        AREA_ID SERIAL,
-        AREA VARCHAR(300),
-        PRIMARY KEY(AREA_ID)
-        )"""
-        cursor.execute(query)
-
-        return redirect(url_for('site.home_page'))
 
 @app.route('/announcements',  methods=['GET', 'POST'])
 def announcements_page():
@@ -151,16 +139,7 @@ def get_announcements():
 
         return announcements
 
-def get_places():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
 
-        cursor.execute("SELECT * FROM PLACES")
-        places = cursor.fetchall()
-
-        connection.commit()
-
-        return places
 
 
 @app.route('/init_announcements')
