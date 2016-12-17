@@ -44,13 +44,14 @@ def signup_page():
         secret = str(request.form['secret'])
         adminkey = 'admin'
         moderator = Moderator(nickname, password)
-        app.moderatorlist.add_moderator(moderator)
-        modid = app.moderatorlist.get_moderator(nickname)
         if secret == adminkey:
             moderator.is_admin = True
             print("The mod", moderator.nickname, " is admin")
         else:
             print("The mod", moderator.nickname, " is NOT admin")
+        app.moderatorlist.add_moderator(moderator)
+        modid = app.moderatorlist.get_moderator(nickname)
+
         login_user(moderator)
         return redirect(url_for('site.home_page'))
 

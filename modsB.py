@@ -3,7 +3,7 @@ import json
 import re
 import psycopg2 as dbapi2
 
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, abort
 from flask import redirect
 from flask.helpers import url_for
 from flask import current_app, request
@@ -29,6 +29,8 @@ def mod_add_page():
     if request.method == 'GET':
         return render_template('modedit.html')
     else:
+        if not current_user.nickname == 'admin':
+            abort(401)
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
         moderator = Moderator(nickname, password)
@@ -43,6 +45,8 @@ def mod_remove_page():
     if request.method == 'GET':
         return render_template('modremove.html')
     else:
+        if not current_user.nickname == 'admin':
+            abort(401)
         nickname = str(request.form['nickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
         current_app.moderatorlist.delete_moderator(mod_id)
@@ -55,6 +59,8 @@ def mod_update_page():
     if request.method == 'GET':
         return render_template('modupdate.html')
     else:
+        if not current_user.nickname == 'admin':
+            abort(401)
         nickname = str(request.form['nickname'])
         newnickname = str(request.form['newnickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
@@ -74,9 +80,8 @@ def init_mod_db():
         query = """CREATE TABLE MODERATORS (
         ID SERIAL,
         NICKNAME VARCHAR(20) NOT NULL,
-        PASSWORD VARCHAR(20),
-        NATIONALITY VARCHAR(20),
-        AGE INTEGER,
+        PASSWORD VARCHAR(20) NOT NULL,
+        IS_ADMIN VARCHAR(6),
         PRIMARY KEY(ID)
         )"""
         cursor.execute(query)
