@@ -20,22 +20,5 @@
     	<li><a href="{{ url_for('mods.mod_remove_page') }}">Delete Moderator</a></li>
     	<li><a href="{{ url_for('mods.mod_update_page') }}">Update Moderator</a></li>
     </ul>
-    <h2>Image Posts</h2>
-    {% if imgposts %}
-    <ul>
-    	{% for imgPost_id, imgpost in imgposts %}
-        <li>
-          {{ imgPost_id }}
-          {{ imgpost.imgname }}
-          {{ imgpost.modid }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <ul>
-		<li><a href="{{ url_for('imgPosts.imgpost_add_page') }}">Add Image Post</a></li>
-		<li><a href="{{ url_for('imgPosts.imgpost_remove_page') }}">Remove Image Post</a></li>
-		<li><a href="{{ url_for('imgPosts.imgpost_update_page') }}">Update Image Post</a></li>
-    </ul>
 {% endif %}
 {% endblock %}

@@ -14,6 +14,7 @@ from _sqlite3 import Row
 from flask_login import UserMixin, login_required, current_user, login_user
 from flask_login.utils import login_required
 from flask_login import logout_user
+from passlib.apps import custom_app_context as pwd_context
 
 mods = Blueprint('mods', __name__)
 
@@ -39,7 +40,8 @@ def mod_add_page():
     else:
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
-        moderator = Moderator(nickname, password)
+        hashed = pwd_context.encrypt(password)
+        moderator = Moderator(nickname, hashed)
         current_app.moderatorlist.add_moderator(moderator)
         modid = current_app.moderatorlist.get_moderator(moderator.nickname)
         message = 'Moderator is added.'

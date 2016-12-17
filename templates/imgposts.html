@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Image Posts{% endblock %}
+{% block content %}
+    <h1>Image Posts </h1>
+    {% if imgposts %}
+    <ul>
+    	{% for imgPost_id, imgpost, modname in imgposts %}
+        <li>
+          ID: <b>{{ imgPost_id }}</b>
+          imgName: <b>{{ imgpost.imgname }}</b>
+          modID: <b>{{ imgpost.modid }}</b>
+          posted by: <b>{{ modname }}</b>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <ul>
+		<li><a href="{{ url_for('imgPosts.imgpost_add_page') }}">Add Image Post</a></li>
+		<li><a href="{{ url_for('imgPosts.imgpost_remove_page') }}">Remove Image Post</a></li>
+		<li><a href="{{ url_for('imgPosts.imgpost_update_page') }}">Update Image Post</a></li>
+    </ul>
+{% endblock %}

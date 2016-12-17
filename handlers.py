@@ -42,14 +42,7 @@ def signup_page():
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
         hashed = pwd_context.encrypt(password)
-        #secret = str(request.form['secret'])
-        #adminkey = 'admin'
         moderator = Moderator(nickname, hashed)
-        #if secret == adminkey:
-        #    moderator.is_admin = True
-        #    print("The mod", moderator.nickname, " is admin")
-        #else:
-        #    print("The mod", moderator.nickname, " is NOT admin")
         app.moderatorlist.add_moderator(moderator)
         modid = app.moderatorlist.get_moderator(nickname)
 
@@ -70,8 +63,12 @@ def login_page():
                     message = 'You have logged in.'
                     next_page = request.args.get('next', url_for('site.home_page'))
                     return redirect(next_page)
-        message = 'Invalid credentials.'
-        return render_template('login.html', message=message)
+                else:
+                    message = 'Invalid credentials.'
+                    return render_template('login.html', message=message)
+        else:
+            message = 'Invalid credentials.'
+            return render_template('login.html', message=message)
 
 @site.route('/logout')
 def logout_page():

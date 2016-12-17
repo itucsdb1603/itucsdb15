@@ -46,6 +46,7 @@
 						{% if current_user.nickname == 'admin' %}
 						<li><a href="{{ url_for('mods.moderators_page') }}">Moderators(AdminPanel)</a></li>
 						{% endif %}
+						<li><a href="{{ url_for('imgPosts.imgposts_page') }}">Image Posts</a></li>
 					</ul>
 					<!--  <form class="navbar-form navbar-left">
 						<div class="input-group">

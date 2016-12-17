@@ -4,6 +4,7 @@ from flask import current_app as app
 from _sqlite3 import Row
 from flask_login import UserMixin
 
+
 class ModeratorList:
     def __init__(self):
             self.last_mod_id = None
@@ -18,6 +19,9 @@ class ModeratorList:
     def delete_moderator(self, mod_id):
         with dbapi2.connect(app.config['dsn']) as connection:
                 cursor = connection.cursor()
+                statement ="""DELETE FROM IMGPOSTS WHERE (MODID = (%s))"""
+                cursor.execute(statement, (mod_id,))
+                connection.commit()
                 statement ="""DELETE FROM MODERATORS WHERE (ID = (%s))"""
                 cursor.execute(statement, (mod_id,))
                 connection.commit()
@@ -44,6 +48,17 @@ class ModeratorList:
                 cursor.close()
             return mod_id
 
+    def get_moderatorName(self, modid):
+            with dbapi2.connect(app.config['dsn']) as connection:
+                cursor = connection.cursor()
+                query = """SELECT NICKNAME FROM MODERATORS WHERE (ID = (%s))"""
+                cursor.execute(query, (modid, ))
+                modName = cursor.fetchone()  # the possibility of having two or more mods with the same name!!!
+                #imgid, imgname, modid
+                connection.commit()
+                cursor.close()
+            return modName
+
     def get_moderators(self):
             with dbapi2.connect(app.config['dsn']) as connection:
                 cursor = connection.cursor()
@@ -57,12 +72,16 @@ class ModeratorList:
             return modTable
 
     def get_moderatorObj(self, mod_name):   # def get_user
+            empty = 'Empty'
             with dbapi2.connect(app.config['dsn']) as connection:
                 cursor = connection.cursor()
                 query = """SELECT PASSWORD FROM MODERATORS WHERE (NICKNAME = (%s))"""
                 cursor.execute(query, (mod_name,))
                 mod_pass = cursor.fetchone()
                 connection.commit()
-                mod = Moderator(mod_name, mod_pass[0])  #[0]
+                if mod_pass is None:
+                    mod = None
+                else:
+                    mod = Moderator(mod_name, mod_pass[0])  #[0]
                 cursor.close()
                 return mod

@@ -1,11 +1,11 @@
 import psycopg2 as dbapi2
 from imgpost import ImgPost
 from flask import current_app as app
+from flask_login import UserMixin
 from _sqlite3 import Row
 
 class ImgPostList:
     def __init__(self):
-            #self.dbfile = dsn
             self.last_key = None
 
     def add_imgPost(self, imgPost):
@@ -34,6 +34,7 @@ class ImgPostList:
                 cursor.execute(statement, (newName, imgPost_id))
                 connection.commit()
 
+# get_imgPost is problematic!
     def get_imgPost(self, imgName):
             with dbapi2.connect(app.config['dsn']) as connection:
                 cursor = connection.cursor()
@@ -45,12 +46,13 @@ class ImgPostList:
             return imgid
 
     def get_imgPostList(self):
+            #modid = app.get_moderator(current_user.nickname)
             with dbapi2.connect(app.config['dsn']) as connection:
                 cursor = connection.cursor()
-                query = """SELECT IMGID, IMGNAME, MODID FROM IMGPOSTS JOIN
-                (MODERATORS RENAME { ID AS MODID })
-                ORDER BY ID"""
+                query = """SELECT IMGID, IMGNAME, MODID, NICKNAME FROM IMGPOSTS JOIN
+                MODERATORS ON MODID=ID
+                ORDER BY IMGID"""
                 cursor.execute(query)
-                imgPostTable = [(id, ImgPost(imgname, modid))
-                          for id, imgname, modid in cursor]
+                imgPostTable = [(id, ImgPost(imgname, modid), modname)
+                          for id, imgname, modid, modname in cursor]
             return imgPostTable
