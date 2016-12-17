@@ -23,49 +23,55 @@ def moderators_page():
     moderators = current_app.moderatorlist.get_moderators()
     return render_template('moderators.html', moderators=moderators)
 
+@mods.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile_page():
+    moderators = current_app.moderatorlist.get_moderators()
+    return render_template('profile.html', moderators=moderators)
+
 @mods.route('/moderators/add', methods=['GET', 'POST'])
 @login_required
 def mod_add_page():
+    if not current_user.nickname == 'admin':
+        abort(401)
     if request.method == 'GET':
         return render_template('modedit.html')
     else:
-        #if not current_user.nickname == 'admin':
-         #   abort(401)
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
         moderator = Moderator(nickname, password)
         current_app.moderatorlist.add_moderator(moderator)
         modid = current_app.moderatorlist.get_moderator(moderator.nickname)
-        flash('Moderator is added.')
+        message = 'Moderator is added.'
         return redirect(url_for('mods.moderators_page'))
 
-@mods.route('/moderators/remove', methods=['GET', 'POST'])
+@mods.route('/profile/remove', methods=['GET', 'POST'])
 @login_required
 def mod_remove_page():
+    if not current_user.nickname == 'admin':
+        abort(401)
     if request.method == 'GET':
         return render_template('modremove.html')
     else:
-        #if not current_user.nickname == 'admin':
-         #   abort(401)
         nickname = str(request.form['nickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
         current_app.moderatorlist.delete_moderator(mod_id)
-        flash('Moderator is removed.')
+        message = 'You have deleted your account.'
         return redirect(url_for('mods.moderators_page'))
 
 @mods.route('/moderators/update', methods=['GET', 'POST'])
 @login_required
 def mod_update_page():
+    if not current_user.nickname == 'admin':
+        abort(401)
     if request.method == 'GET':
         return render_template('modupdate.html')
     else:
-        #if not current_user.is_admin:
-         #   abort(401)
         nickname = str(request.form['nickname'])
         newnickname = str(request.form['newnickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
         current_app.moderatorlist.update_moderator(mod_id, newnickname)
-        flash('Moderator is updated.')
+        #message = 'You have changed your name.'
         return redirect(url_for('mods.moderators_page'))
 
 @mods.route('/initmods')
@@ -79,7 +85,7 @@ def init_mod_db():
 
         query = """CREATE TABLE MODERATORS (
         ID SERIAL,
-        NICKNAME VARCHAR(20) NOT NULL,
+        NICKNAME VARCHAR(20) UNIQUE NOT NULL,
         PASSWORD VARCHAR(300) NOT NULL,
         IS_ADMIN VARCHAR(6),
         PRIMARY KEY(ID)

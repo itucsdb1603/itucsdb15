@@ -29,9 +29,8 @@ site = Blueprint('site', __name__)
 
 @site.route('/home')
 def home_page():
-    moderator = current_user._get_current_object()
-    flash('You are successfully logged in')
-    return render_template('home.html')
+    message = 'You have successfully logged in'
+    return render_template('home.html', message=message)
 
 #---- Login ----
 
@@ -66,20 +65,19 @@ def login_page():
         mod = app.moderatorlist.get_moderatorObj(nickname)
         if mod is not None:
                 password = str(request.form['password'])
-                #hashed = pwd_context.encrypt(mod.password)
-                if pwd_context.verify(password, mod.password):  ######
+                if pwd_context.verify(password, mod.password):
                     login_user(mod)
-                    flash('You have logged in.')
+                    message = 'You have logged in.'
                     next_page = request.args.get('next', url_for('site.home_page'))
                     return redirect(next_page)
-        flash('Invalid credentials.')
-        return render_template('login.html')
+        message = 'Invalid credentials.'
+        return render_template('login.html', message=message)
 
 @site.route('/logout')
 def logout_page():
     logout_user()
-    flash('You have logged out.')
-    return redirect(url_for('site.signup_page'))
+    message = 'You have logged out.'
+    return render_template('logout.html', message=message)
 
 #---- Login end ----
 

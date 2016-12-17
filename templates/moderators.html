@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
-{% block title %}Moderators and ImagePosts{% endblock %}
+{% block title %}Moderators{% endblock %}
 {% block content %}
-    <h1>Moderators</h1>
+{% if current_user.nickname == 'admin' %}
+    <h1>Moderators (id, nickname)</h1>
 
     {% if moderators %}
     <ul>
@@ -13,13 +14,12 @@
         {% endfor %}
     </ul>
     {% endif %}
-	{% if current_user.is_authenticated %}
+
     <ul>
     	<li><a href="{{ url_for('mods.mod_add_page') }}">Add Moderator</a></li>
     	<li><a href="{{ url_for('mods.mod_remove_page') }}">Delete Moderator</a></li>
     	<li><a href="{{ url_for('mods.mod_update_page') }}">Update Moderator</a></li>
     </ul>
-    {% endif %}
     <h2>Image Posts</h2>
     {% if imgposts %}
     <ul>
@@ -37,5 +37,5 @@
 		<li><a href="{{ url_for('imgPosts.imgpost_remove_page') }}">Remove Image Post</a></li>
 		<li><a href="{{ url_for('imgPosts.imgpost_update_page') }}">Update Image Post</a></li>
     </ul>
-
+{% endif %}
 {% endblock %}
