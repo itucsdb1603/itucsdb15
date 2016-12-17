@@ -59,5 +59,5 @@ class ModeratorList:
                 cursor.execute(query, (mod_name,))
                 mod_pass = cursor.fetchone()
                 connection.commit()
-                mod = Moderator(mod_name, mod_pass)
+                mod = Moderator(mod_name, mod_pass[0])
                 return mod

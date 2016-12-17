@@ -21,7 +21,8 @@ from place import Place
 from placelist import PlaceList
 from flask import current_app as app
 from sqlite3 import Row
-from flask_login import LoginManager, current_user, login_user
+from flask_login import LoginManager, current_user, login_user, logout_user
+from passlib.apps import custom_app_context as pwd_context
 
 site = Blueprint('site', __name__)
 
@@ -41,29 +42,44 @@ def signup_page():
     else:
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
-        secret = str(request.form['secret'])
-        adminkey = 'admin'
-        moderator = Moderator(nickname, password)
-        if secret == adminkey:
-            moderator.is_admin = True
-            print("The mod", moderator.nickname, " is admin")
-        else:
-            print("The mod", moderator.nickname, " is NOT admin")
+        hashed = pwd_context.encrypt(password)
+        #secret = str(request.form['secret'])
+        #adminkey = 'admin'
+        moderator = Moderator(nickname, hashed)
+        #if secret == adminkey:
+        #    moderator.is_admin = True
+        #    print("The mod", moderator.nickname, " is admin")
+        #else:
+        #    print("The mod", moderator.nickname, " is NOT admin")
         app.moderatorlist.add_moderator(moderator)
         modid = app.moderatorlist.get_moderator(nickname)
 
         login_user(moderator)
         return redirect(url_for('site.home_page'))
 
-@site.route('/signin', methods=['GET', 'POST'])
-def signin_page():
+@site.route('/login', methods=['GET', 'POST'])
+def login_page():
     if request.method == 'GET':
-        return render_template('signin.html')
+        return render_template('login.html')
     else:
         nickname = str(request.form['nickname'])
-        password = str(request.form['password'])
+        mod = app.moderatorlist.get_moderatorObj(nickname)
+        if mod is not None:
+                password = str(request.form['password'])
+                #hashed = pwd_context.encrypt(mod.password)
+                if pwd_context.verify(password, mod.password):  ######
+                    login_user(mod)
+                    flash('You have logged in.')
+                    next_page = request.args.get('next', url_for('site.home_page'))
+                    return redirect(next_page)
+        flash('Invalid credentials.')
+        return render_template('login.html')
 
-        return redirect(url_for('site.home_page'))
+@site.route('/logout')
+def logout_page():
+    logout_user()
+    flash('You have logged out.')
+    return redirect(url_for('site.signup_page'))
 
 #---- Login end ----
 

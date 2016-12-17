@@ -29,8 +29,8 @@ def mod_add_page():
     if request.method == 'GET':
         return render_template('modedit.html')
     else:
-        if not current_user.nickname == 'admin':
-            abort(401)
+        #if not current_user.nickname == 'admin':
+         #   abort(401)
         nickname = str(request.form['nickname'])
         password = str(request.form['password'])
         moderator = Moderator(nickname, password)
@@ -45,8 +45,8 @@ def mod_remove_page():
     if request.method == 'GET':
         return render_template('modremove.html')
     else:
-        if not current_user.nickname == 'admin':
-            abort(401)
+        #if not current_user.nickname == 'admin':
+         #   abort(401)
         nickname = str(request.form['nickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
         current_app.moderatorlist.delete_moderator(mod_id)
@@ -59,8 +59,8 @@ def mod_update_page():
     if request.method == 'GET':
         return render_template('modupdate.html')
     else:
-        if not current_user.nickname == 'admin':
-            abort(401)
+        #if not current_user.is_admin:
+         #   abort(401)
         nickname = str(request.form['nickname'])
         newnickname = str(request.form['newnickname'])
         mod_id = current_app.moderatorlist.get_moderator(nickname)
@@ -80,7 +80,7 @@ def init_mod_db():
         query = """CREATE TABLE MODERATORS (
         ID SERIAL,
         NICKNAME VARCHAR(20) NOT NULL,
-        PASSWORD VARCHAR(20) NOT NULL,
+        PASSWORD VARCHAR(300) NOT NULL,
         IS_ADMIN VARCHAR(6),
         PRIMARY KEY(ID)
         )"""
