@@ -2,6 +2,7 @@ import psycopg2 as dbapi2
 from moderator import Moderator
 from flask import current_app as app
 from _sqlite3 import Row
+from flask_login import UserMixin
 
 class ModeratorList:
     def __init__(self):
@@ -48,4 +49,15 @@ class ModeratorList:
                 cursor.execute(query)
                 modTable = [(id, Moderator(nickname, password))
                           for id, nickname, password in cursor]
+                connection.commit()
             return modTable
+
+    def get_moderatorObj(self, mod_name):   # def get_user
+            with dbapi2.connect(app.config['dsn']) as connection:
+                cursor = connection.cursor()
+                query = """SELECT PASSWORD FROM MODERATORS WHERE (NICKNAME = (%s))"""
+                cursor.execute(query, (mod_name,))
+                mod_pass = cursor.fetchone()
+                connection.commit()
+                mod = Moderator(mod_name, mod_pass)
+                return mod

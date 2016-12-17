@@ -4,7 +4,7 @@ import json
 import re
 import psycopg2 as dbapi2
 
-from flask import Flask, current_app
+from flask import Flask, current_app, session
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -24,7 +24,15 @@ from place import Place
 from placelist import PlaceList
 from placesB import places
 from eventsB import events
+from flask_login import LoginManager
 import placesB
+
+login_manager = LoginManager()
+
+@login_manager.user_loader
+def load_user(user_id):
+    mod = app.moderatorlist.get_moderatorObj(user_id)
+    return mod
 
 def create_app():
     app = Flask(__name__)
@@ -39,7 +47,11 @@ def create_app():
     app.hashtagContents = HashtagContents()
     app.eventlist = EventList()
     app.placelist = PlaceList()
+    app.secret_key = "secret key"
+    login_manager.init_app(app)
+    login_manager.login_view = 'site.signup_page'
     return app
+
 app = create_app()
 
 def get_elephantsql_dsn(vcap_services):

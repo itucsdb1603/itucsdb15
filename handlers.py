@@ -3,11 +3,14 @@ import json
 import re
 import psycopg2 as dbapi2
 
+from flask import Flask, session, flash
 from flask import Blueprint, render_template
 from flask import redirect
 from flask.helpers import url_for
 from datetime import datetime
-from flask import current_app, request
+from flask import request
+from moderator import Moderator
+from moderatorlist import ModeratorList
 from hashtag import Hashtag
 from hashtags import Hashtags
 from hashtagContent import HashtagContent
@@ -17,20 +20,51 @@ from eventlist import EventList
 from place import Place
 from placelist import PlaceList
 from flask import current_app as app
-from _sqlite3 import Row
-#from flask.ext.login import LoginManager
+from sqlite3 import Row
+from flask_login import LoginManager, current_user, login_user
 
 site = Blueprint('site', __name__)
 
-@site.route('/')
-def home_page():
-    now = datetime.now()
-    day = now.strftime('%A')
-    return render_template('home.html', day_name=day)
 
-@site.route('/signup')
+@site.route('/home')
+def home_page():
+    moderator = current_user._get_current_object()
+    flash('You are successfully logged in')
+    return render_template('home.html')
+
+#---- Login ----
+
+@site.route('/', methods=['GET', 'POST'])
 def signup_page():
-    return render_template('signup.html')
+    if request.method == 'GET':
+        return render_template('signup.html')
+    else:
+        nickname = str(request.form['nickname'])
+        password = str(request.form['password'])
+        secret = str(request.form['secret'])
+        adminkey = 'admin'
+        moderator = Moderator(nickname, password)
+        app.moderatorlist.add_moderator(moderator)
+        modid = app.moderatorlist.get_moderator(nickname)
+        if secret == adminkey:
+            moderator.is_admin = True
+            print("The mod", moderator.nickname, " is admin")
+        else:
+            print("The mod", moderator.nickname, " is NOT admin")
+        login_user(moderator)
+        return redirect(url_for('site.home_page'))
+
+@site.route('/signin', methods=['GET', 'POST'])
+def signin_page():
+    if request.method == 'GET':
+        return render_template('signin.html')
+    else:
+        nickname = str(request.form['nickname'])
+        password = str(request.form['password'])
+
+        return redirect(url_for('site.home_page'))
+
+#---- Login end ----
 
 @site.route('/hashtags')
 def hashtags_page():

@@ -19,26 +19,44 @@
 	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
 	crossorigin="anonymous"></script>
 <meta charset="utf-8" />
+<title>ShakeSpace - Sign up!</title>
 <body>
-<div class="container">
-	<div class="row" style = "margin-top:100px;">
-		<div class="col-lg-3 col-md-3 col-sm-2 col-xs-hidden"></div>
-		<div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
-			<legend>
-				<i class="glyphicon glyphicon-globe"></i></a> Sign up ShakeSpace!
-			</legend>
-			<form action="#" method="post" class="form" role="form">
-				<input class="form-control" name="yourusername" placeholder="Username" type="username" />
-				<input class="form-control" name="youremail" placeholder="Email" type="email" />
-				<input class="form-control" name="password" placeholder="Password" type="password" /> 
-				
-				</label> <br /> <br />
-				<button class="btn btn-lg btn-primary btn-block" type="submit">
-					Sign up</button>
-			</form>
-		</div>
-		<div class="col-lg-3 col-md-3 col-sm-2 col-xs-hidden"></div>
-	</div>
-</div>
+	<div class="page-header">
+        <h1>Sign up to enter the website If you already have signed up, <!--<a href="{{ url_for('site.signin_page') }}"></a>-->Sign in</h1>
+      </div>
 
+      <form role="form" action="" method="post" name="signup"
+            class="form-horizontal">
+        <div class="form-group">
+          <label for="nick" class="control-label col-sm-2">Choose a Nickname:</label>
+          <div class="col-sm-10">
+            <input type="text" name="nickname" required autofocus />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pass" class="control-label col-sm-2">Password:</label>
+          <div class="col-sm-10">
+            <input type="text" name="password" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="secret" class="control-label col-sm-2">Enter the Secret Key:</label>
+          <div class="col-sm-10">
+            <input type="text" name="secret" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" name="save"
+                    class="btn btn-primary">Save</button>
+          </div>
+        </div>
+      </form>
+	<footer> &copy; 2016, ShakeSpace </footer>
 </body>
+</html>
+
+
