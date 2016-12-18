@@ -19,6 +19,8 @@ from event import Event
 from eventlist import EventList
 from place import Place
 from placelist import PlaceList
+from textpost import TextPost
+from textpostlist import TextPostList
 from flask import current_app as app
 from sqlite3 import Row
 from flask_login import LoginManager, current_user, login_user, logout_user

@@ -43,10 +43,13 @@
 						<li><a href="{{ url_for('events.events_page') }}">Events</a></li>
 						<li><a href="{{ url_for('announcements_page') }}">Announcements</a></li>
 						<li><a href="{{ url_for('site.hashtags_page') }}">Hashtags</a></li>
+						<li><a href="{{ url_for('TextPosts.textposts_page') }}">Text Posts</a></li>
+					
 						{% if current_user.nickname == 'admin' %}
 						<li><a href="{{ url_for('mods.moderators_page') }}">Moderators(AdminPanel)</a></li>
 						{% endif %}
 						<li><a href="{{ url_for('imgPosts.imgposts_page') }}">Image Posts</a></li>
+						
 					</ul>
 					<!--  <form class="navbar-form navbar-left">
 						<div class="input-group">

@@ -24,6 +24,9 @@ from place import Place
 from placelist import PlaceList
 from placesB import places
 from eventsB import events
+from textpost import TextPost
+from textpostlist import TextPostList
+from textpostsB import TextPosts
 from flask_login import LoginManager
 import placesB
 
@@ -41,8 +44,10 @@ def create_app():
     app.register_blueprint(imgPosts)
     app.register_blueprint(places)
     app.register_blueprint(events)
+    app.register_blueprint(TextPosts)
     app.moderatorlist = ModeratorList()
     app.imgpostlist = ImgPostList()
+    app.textpostlist = TextPostList()
     app.hashtags = Hashtags()
     app.hashtagContents = HashtagContents()
     app.eventlist = EventList()
@@ -322,7 +327,29 @@ def init_topics_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
+    
+@app.route('/inittextposts')
+def init_posts():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
 
+        query = """DROP TABLE IF EXISTS TEXTPOSTS CASCADE"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE TEXTPOSTS(
+        POSTID SERIAL,
+        CONTENT VARCHAR(300),
+        WRITER INTEGER,
+        PRIMARY KEY(POSTID),
+        FOREIGN KEY (WRITER) REFERENCES MODERATORS (ID)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+        )"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+    
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:

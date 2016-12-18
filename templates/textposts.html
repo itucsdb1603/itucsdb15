@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}Text Posts{% endblock %}
+{% block content %}
+    <h1>Text Posts </h1>
+    
+    <ul>
+		<li><a href="{{ url_for('TextPosts.textpost_add_page') }}">Add Text Post</a></li>
+		<li><a href="{{ url_for('TextPosts.textpost_remove_page') }}">Remove Text Post</a></li>
+		<li><a href="{{ url_for('TextPosts.textpost_update_page') }}">Update Text Post</a></li>
+    </ul>
+{% endblock %}
