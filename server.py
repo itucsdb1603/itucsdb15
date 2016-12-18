@@ -18,6 +18,8 @@ from hashtags import Hashtags
 from hashtag import Hashtag
 from hashtagContent import HashtagContent
 from hashtagContents import HashtagContents
+from hashtagsB import hashtags
+from hashtagContentsB import hashtagContents
 from event import Event
 from eventlist import EventList
 from place import Place
@@ -45,6 +47,8 @@ def create_app():
     app.register_blueprint(places)
     app.register_blueprint(events)
     app.register_blueprint(TextPosts)
+    app.register_blueprint(hashtags)
+    app.register_blueprint(hashtagContents)
     app.moderatorlist = ModeratorList()
     app.imgpostlist = ImgPostList()
     app.textpostlist = TextPostList()
@@ -186,46 +190,6 @@ def init_announcements_db():
         connection.commit()
         return redirect(url_for('site.home_page'))
 
-@app.route('/init_hashtags')
-def init_hashtag_db():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
-
-        query = """DROP TABLE IF EXISTS HASHTAGS CASCADE"""
-        cursor.execute(query)
-
-        query = """CREATE TABLE HASHTAGS (
-        ID SERIAL NOT NULL,
-        NAME VARCHAR(50),
-        PRIMARY KEY(ID)
-        )"""
-        cursor.execute(query)
-
-        connection.commit()
-        return redirect(url_for('site.home_page'))
-
-@app.route('/init_hashtagContents')
-def init_hashtagContents_db():
-    with dbapi2.connect(app.config['dsn']) as connection:
-        cursor = connection.cursor()
-
-        query = """DROP TABLE IF EXISTS HASHTAGCONTENTS"""
-        cursor.execute(query)
-
-        query = """CREATE TABLE HASHTAGCONTENTS (
-        HASHTAGID INTEGER,
-        ID SERIAL NOT NULL,
-        CONTENT VARCHAR(300),
-        PRIMARY KEY(HASHTAGID, ID),
-        FOREIGN KEY(HASHTAGID)
-        REFERENCES HASHTAGS(ID)
-        ON DELETE CASCADE
-        )"""
-        cursor.execute(query)
-
-        connection.commit()
-        return redirect(url_for('site.home_page'))
-
 @app.route('/init_users')
 def init_user_db():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -327,7 +291,7 @@ def init_topics_db():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 @app.route('/inittextposts')
 def init_posts():
     with dbapi2.connect(app.config['dsn']) as connection:
@@ -350,7 +314,7 @@ def init_posts():
 
         connection.commit()
         return redirect(url_for('site.home_page'))
-    
+
 if __name__ == '__main__':
     VCAP_APP_PORT = os.getenv('VCAP_APP_PORT')
     if VCAP_APP_PORT is not None:

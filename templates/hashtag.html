@@ -3,16 +3,19 @@
 {% block content %}
     <h1>{{ hashtag.name }}</h1>
     <ul>
-		<a href="{{ url_for('site.hashtagContent_add_page') }}">Add Content</a>
-		<a href="{{ url_for('site.hashtagContent_update_page') }}">Update Content</a>
-		<a href="{{ url_for('site.hashtagContent_delete_page') }}">Delete Content</a>
+		<a href="{{ url_for('hashtagContents.hashtagContent_add_page', hashtag_id = hashtagid ) }}">Add Content</a>
+		<a href="{{ url_for('hashtagContents.hashtagContent_update_page', hashtag_id = hashtagid) }}">Update Content</a>
+		<a href="{{ url_for('hashtagContents.hashtagContent_delete_page', hashtag_id = hashtagid) }}">Delete Content</a>
 	</ul>
 	{% if hashtagContents %}
     <ul>
     	{% for hashtagContent_id, hashtagContent in hashtagContents %}
         <li>
+         <a>
+          {{ hashtagContent_id}}
+         </a>
         <a>
-          {{ hashtagContent.content}}
+          {{ hashtagContent.hashtagid}}
          </a>
         </li>
         {% endfor %}
