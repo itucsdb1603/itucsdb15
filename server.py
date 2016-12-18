@@ -183,10 +183,7 @@ def init_announcements_db():
             ON UPDATE CASCADE
         )"""
         cursor.execute(query)
-
-        query = """INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES ('Sample announcement!', 1)"""
-        cursor.execute(query)
-
+        
         connection.commit()
         return redirect(url_for('site.home_page'))
 
