@@ -50,3 +50,15 @@ class TextPostList:
                TextPostTable = [(id, TextPost(content, writer), modname)
                           for id, content, writer, modname in cursor]
             return TextPostTable
+        
+    def get_TextPostListofMod(self, writer):
+            with dbapi2.connect(app.config['dsn']) as connection:
+               cursor = connection.cursor()
+               query = """SELECT POSTID, CONTENT, WRITER, NICKNAME FROM TEXTPOSTS JOIN
+                MODERATORS ON WRITER=ID
+                WHERE WRITER = (%s)
+                ORDER BY POSTID"""
+               cursor.execute(query, (writer,))
+               TextPostTableofMod = [(id, TextPost(content, writer), modname)
+                          for id, content, writer, modname in cursor]
+            return TextPostTableofMod

@@ -2,6 +2,19 @@
 {% block title %}Text Posts{% endblock %}
 {% block content %}
     <h1>Text Posts </h1>
+    {% if textposts %}
+    <ul>
+    	{% for textPost_id, textpost, modname in textposts %}
+        <li>
+        	<div class="textpost-content">
+          		Post: <b>{{ textpost.content }}</b>
+          	</div>
+          	<div class="textpost-author">
+          		posted by: <b>{{ modname }}</b>
+        	</div>
+        {% endfor %}
+    </ul>
+    {% endif %}
     
     <ul>
 		<li><a href="{{ url_for('TextPosts.textpost_add_page') }}">Add Text Post</a></li>

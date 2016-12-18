@@ -22,9 +22,10 @@ TextPosts = Blueprint('TextPosts', __name__)
 @TextPosts.route('/textposts')
 @login_required
 def textposts_page():
-    #textposts = app.textpostlist.get_TextPostList()
+    writer = app.moderatorlist.get_moderator(current_user.nickname)
+    textposts = app.textpostlist.get_TextPostListofMod(writer)
     #return redirect(url_for('TextPosts.textposts_page'))
-    return render_template('textposts.html')
+    return render_template('textposts.html', textposts=textposts)
 
 @TextPosts.route('/textposts/add_text_posts', methods=['GET', 'POST'])
 @login_required
