@@ -1,61 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style media="screen" type="text/css">
-	div.row.bg-info {
-		background-color: #fff;
-	}
-	
-	nav.navbar.navbar-dark.bg-inverse, nav.navbar.navbar-default {
-		background-color: #3c5c77;
-	}
-	
-	nav.navbar.navbar-dark.bg-inverse a {
-		color: #fff !important;
-	}
-	
-	nav.navbar.navbar-dark.bg-inverse a {
-		min-height: 60px;
-	}
-	
-	.container-fluid {
-		margin-top: 5px;
-	}
-	
-	
-	div.row.bg-info div.navbar-header a.navbar-brand {
-		color: #3c5c77 !important; 
-	}
-	h1, h2, h3, h4 {
-		color: #3c5c77 !important;
-	}
-	
-	ul.flashes li{
-		list-style-type: none;
-		font-size: 13px;
-	}
-	
-	footer{
-		position: relative;
-	    z-index: 10;
-	    height: 3em;
-	    margin-left: 3em;
-	    margin-top: 31em;
-	}
-	
-	div#moderators {
-		margin-left: 15px;
-	    border: 1px solid #e7e7e7;
-	    border-radius: 5px;
-	    width: 23%;
-	    padding-bottom: 13px;
-	}
-	
-	div#username-block {
-		padding-left: 25px;
-	}
-</style>
-
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet"
 	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -88,10 +33,7 @@
 							class="icon-bar"></span> <span class="icon-bar"></span> <span
 							class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">
-						<img style="height: 43px; width: auto; margin-top: -12px;"
-							src="https://s29.postimg.org/t7685fauf/Logomakr_46jyh_G.png">
-					</a>
+					<a class="navbar-brand" href="#">ShakeSpace</a>
 				</div>
 
 				<div class="collapse navbar-collapse"
@@ -140,9 +82,20 @@
 							class="icon-bar"></span> <span class="icon-bar"></span> <span
 							class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">Topics</a>
+					<a class="navbar-brand" a href="{{ url_for('Topics.topics_page')}}">Topics</a>
+					<br></br>
+    				<ul>
+    				{% for topic_id, topic, modname in topics %}
+    				<li>
+        					<div class="topic-content">
+          					Post: <b>{{ topic.content }}</b>
+          					</div>
+          					<div class="topic-author">
+          					created by: <b>{{ modname }}</b>
+        					</div>
+        			{% endfor %}
+    				</ul>
 				</div>
-
 				<div class="collapse navbar-collapse navbar-ex1-collapse"></div>
 			</nav>
 		</div>

@@ -26,6 +26,9 @@ from place import Place
 from placelist import PlaceList
 from placesB import places
 from eventsB import events
+from topic import Topic
+from topiclist import TopicList
+from topicsB import Topics
 from textpost import TextPost
 from textpostlist import TextPostList
 from textpostsB import TextPosts
@@ -49,6 +52,8 @@ def create_app():
     app.register_blueprint(TextPosts)
     app.register_blueprint(hashtags)
     app.register_blueprint(hashtagContents)
+    app.register_blueprint(Topics)
+    app.topiclist = TopicList()
     app.moderatorlist = ModeratorList()
     app.imgpostlist = ImgPostList()
     app.textpostlist = TextPostList()
@@ -103,49 +108,33 @@ def announcements_page():
     if 'add_announcement' in request.form:
         content = str(request.form['CONTENT'])
         area_id = str(request.form['AREA_ID'])
-
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
             cursor.execute("""INSERT INTO ANNOUNCEMENTS (CONTENT, AREA_ID) VALUES (%s, %s)""", [content, area_id])
-
             connection.commit()
-
     elif 'init_announcements' in request.form:
         init_announcements_db()
-
     elif 'delete_announcement' in request.form:
         delete_id = request.form['delete_id']
-
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
             cursor.execute("""DELETE FROM ANNOUNCEMENTS WHERE ID=%s""", delete_id)
-
             connection.commit()
-
     elif 'edit_announcement' in request.form:
         edit_id = request.form['edit_id']
-
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
             cursor.execute("""SELECT * FROM ANNOUNCEMENTS WHERE ID=%s""", edit_id)
             selectedAnnouncement = cursor.fetchall()
             connection.commit()
-
             return render_template('update_announcement.html', announcements = selectedAnnouncement)
-
     elif 'selected_announcement_update' in request.form:
         announcement_id = request.form['id']
         announcement_content = request.form['content']
-
         with dbapi2.connect(app.config['dsn']) as connection:
             cursor = connection.cursor()
-
             cursor.execute("""UPDATE ANNOUNCEMENTS SET CONTENT=%s WHERE id=%s""", (announcement_content, announcement_id))
             connection.commit()
-
     allAnnouncements = get_announcements()
     allPlaces = current_app.placelist.get_places()
     return render_template('announcements.html', announcements = allAnnouncements, places = allPlaces)
@@ -183,7 +172,7 @@ def init_announcements_db():
             ON UPDATE CASCADE
         )"""
         cursor.execute(query)
-        
+
         connection.commit()
         return redirect(url_for('site.home_page'))
 
@@ -303,6 +292,28 @@ def init_posts():
         WRITER INTEGER,
         POSTTOPIC VARCHAR(40),
         PRIMARY KEY(POSTID),
+        FOREIGN KEY (WRITER) REFERENCES MODERATORS (ID)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+        )"""
+        cursor.execute(query)
+
+        connection.commit()
+        return redirect(url_for('site.home_page'))
+
+@app.route('/inittopics')
+def init_topics():
+    with dbapi2.connect(app.config['dsn']) as connection:
+        cursor = connection.cursor()
+
+        query = """DROP TABLE IF EXISTS TOPICS CASCADE"""
+        cursor.execute(query)
+
+        query = """CREATE TABLE TOPICS(
+        TOP_ID SERIAL,
+        CONTENT VARCHAR(300),
+        WRITER INTEGER,
+        PRIMARY KEY(TOP_ID),
         FOREIGN KEY (WRITER) REFERENCES MODERATORS (ID)
             ON DELETE CASCADE
             ON UPDATE CASCADE

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}Topics{% endblock %}
+{% block content %}
+    <h1>Topics</h1>
+    {% if topics %}
+    <ul>
+    	{% for topic_id, topic, modname in topics %}
+        <li>
+        	<div class="topic-content">
+          		Post: <b>{{ topic.content }}</b>
+          	</div>
+          	<div class="topic-author">
+          		posted by: <b>{{ modname }}</b>
+        	</div>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    <ul>
+		<li><a href="{{ url_for('Topics.topic_add_page') }}">Add Topic</a></li>
+		<li><a href="{{ url_for('Topics.topic_remove_page') }}">Remove Topic</a></li>
+    </ul>
+{% endblock %}
