@@ -1,20 +1,24 @@
 {% extends "layout.html" %}
 {% block title %}Moderators and ImagePosts{% endblock %}
 {% block content %}
-        <h1>Your Profile</h1>
+    <h1>Your Profile</h1>
+	    <div id="username-block">
+	      <h4>Your user name: <b>{{ current_user.nickname }}</b></h4>
+	    </div>
     </div>
-      <h2>Your user name: <b>{{ current_user.nickname }}</b></h2>
-    <h3>Other Moderators:</h3>
-    {% if moderators %}
-    <ul>
-    	{% for mod_id, moderator in moderators %}
-        <li>
-          {{ mod_id }}
-          {{ moderator.nickname }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    <div class="col-md-3" id="moderators">
+	    <h3>Other Moderators:</h3>
+	    {% if moderators %}
+	    <ul>
+	    	{% for mod_id, moderator in moderators %}
+	        <li>
+	          {{ mod_id }}
+	          {{ moderator.nickname }}
+	        </li>
+	        {% endfor %}
+	    </ul>
+	    {% endif %}
+	 </div>
 {% endblock %}
 
 
