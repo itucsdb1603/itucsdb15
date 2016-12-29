@@ -15,7 +15,7 @@ All passwords are stored in the database and they are all hashed. For more techn
 
 Below, you will see two screenshots from ShakeSpace. In the first one, you can see that someone tries to access to
 imageposts page without having logged in. After that, ShakeSpace would redirect this person to the sign up page as
- it can be seen from the second screenshot.
+it can be seen from the second screenshot.
 
    .. figure:: cem_ss/access_1.png
       :scale: 50 %
@@ -29,7 +29,7 @@ imageposts page without having logged in. After that, ShakeSpace would redirect 
       Redirection to the signup page.
 
 Having signed up with the nickname 'mumtaz', after login ShakeSpace will welcome you. Now the visitor can post some posts,
- create events, check his/her profile and so on.
+create events, check his/her profile and so on.
 
    .. figure:: cem_ss/welcome.PNG
       :scale: 50 %
@@ -41,8 +41,8 @@ Let's check mumtaz's profile. Here, the nickname of the current user and the oth
       :scale: 50 %
       :alt: Profile
 
-Apart from logins, I have created ImagePosts page as well. Well, you can not post an image, instead you can only post a text unfortunately.
- In this page, you can observe the image post feed that is all the image posts that have been posted.
+Apart from logins, I have created ImagePosts page as well. Well, you can not post an image, instead you can only post text unfortunately.
+In this page, you can observe the image post feed that is all the image posts that have been posted.
 
    .. figure:: cem_ss/imageposts.PNG
       :scale: 50 %
@@ -114,7 +114,7 @@ Let's delete ‘mumtaz’ and see what happens.
    .. figure:: cem_ss/admin_panel2.PNG
       :scale: 50 %
       :alt: admin_panel2
-   .. figure:: cem_ss/mumtaz.png
+   .. figure:: cem_ss/mumtaz.PNG
       :scale: 50 %
       :alt: mumtaz
 
