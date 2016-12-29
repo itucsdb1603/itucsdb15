@@ -1,22 +1,21 @@
 User Guide
 ==========
 
-**explain how your application works from the user perspective, use
-screenshots whereever appropriate**
+It is quite easy to sign up to ShakeSpace, login and logout.
+ShakeSpace provides all the links that user may need to go and using the
+advantage of its simple and clean design any user can use ShakeSpace
+comfortably.
 
-**to add a picture, use the following example**::
-
-   .. figure:: picture.png
+   .. figure:: cem_ss/signup_page.png
       :scale: 50 %
-      :alt: map to buried treasure
+      :alt: sign_up page
 
-      This is the caption of the figure (a simple paragraph).
+      Sign up page of ShakeSpace.
 
 .. toctree::
 
    member1
-   member2
+   Mumtaz Cem Eris
    member3
    member4
    member5
-   

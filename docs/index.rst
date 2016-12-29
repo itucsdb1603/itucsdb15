@@ -1,5 +1,5 @@
-Welcome to itucsdb's documentation!
-===================================
+Welcome to itucsdb1603's documentation!
+=======================================
 
 :Team: ShakeSpace
 
@@ -11,7 +11,7 @@ Welcome to itucsdb's documentation!
    * Member 4
    * Member 5
 
-**Welcome to ShakeSpace**
+**ShakeSpace**
 
 ShakeSpace allows people to share
 their opinions in any topic with a wide
