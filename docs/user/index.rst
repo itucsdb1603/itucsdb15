@@ -4,7 +4,8 @@ User Guide
 It is quite easy to sign up to ShakeSpace, login and logout.
 ShakeSpace provides all the links that user may need to go and using the
 advantage of its simple and clean design any user can use ShakeSpace
-comfortably.
+comfortably. For more detail, you can check Mumtaz Cem Eris's work and
+technical guide.
 
    .. figure:: cem_ss/signup_page.png
       :scale: 50 %
@@ -15,7 +16,7 @@ comfortably.
 .. toctree::
 
    member1
-   Mumtaz Cem Eris
+   member2
    member3
    member4
    member5
