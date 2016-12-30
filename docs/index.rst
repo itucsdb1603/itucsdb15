@@ -8,8 +8,7 @@ Welcome to itucsdb1603's documentation!
    * Ipek Karakurt
    * Mumtaz Cem Eris
    * Emre Can Agatay
-   * R. Batuhan İşlek
-   * Member 5
+   * Batuhan İşlek
 
 **ShakeSpace**
 
