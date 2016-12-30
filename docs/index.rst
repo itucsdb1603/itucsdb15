@@ -28,3 +28,4 @@ Contents:
 
    user/index
    developer/index
+   installation/index
