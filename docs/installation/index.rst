@@ -7,7 +7,7 @@ Following programs and extensions must be downloaded in order to run this projec
 
 To download Python 3.5 go to:
 
-.. _a link: https://www.python.org/downloads/
+   .. _a link: https://www.python.org/downloads/
 
 **Flask**
 
@@ -24,7 +24,7 @@ You can use the command above to download these.
 
 To download PostgreSQL go to:
 
-.. _a link: https://www.postgresql.org/download/
+   .. _a link: https://www.postgresql.org/download/
 
 After having downloaded all above, you must setup local database. When the setup of local database is done, make sure
 you arrange 'post', 'user' and 'password' according to your choice.
