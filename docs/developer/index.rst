@@ -27,16 +27,7 @@ The database contains the following 9 tables:
 Code
 ----
 
-**explain the technical structure of your code**
-
-**to include a code listing, use the following example**::
-
-   .. code-block:: python
-
-      class Foo:
-
-         def __init__(self, x):
-            self.x = x
+The technical structure of the code is described in the following sections.
 
 .. toctree::
 
