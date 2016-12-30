@@ -9,7 +9,7 @@ To download Python 3.5 go to https://www.python.org/downloads/.
 
 **Flask**
 
-Flask framework is used in this project. You can instal Flask by typing:
+Flask framework is used in this project. You can install Flask by typing:
 
    .. code-block:: python
 
@@ -23,7 +23,7 @@ You can use the command above to download these.
 To download PostgreSQL go to https://www.postgresql.org/download/.
 
 After having downloaded all above, you must setup local database. When the setup of local database is done, make sure
-you arrange 'post', 'user' and 'password' according to your choice.
+you arrange 'port', 'dbname', 'user' and 'password' according to your choice.
 
    .. code-block:: python
 

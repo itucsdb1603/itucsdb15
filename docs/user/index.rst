@@ -1,10 +1,10 @@
 User Guide
 ==========
 
-It is quite easy to sign up to ShakeSpace, login and logout.
-ShakeSpace provides all the links that user may need to go and using the
+It is quite easy to sign up to ShakeSpace, login and logout too.
+ShakeSpace provides all the links that user needs and using the
 advantage of its simple and clean design any user can use ShakeSpace
-comfortably. For more detail, you can check Mumtaz Cem Eris's work and
+comfortably. For more detail, you can check our members' work and
 technical guide.
 
    .. figure:: cem_ss/signup_page.png
