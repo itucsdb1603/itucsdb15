@@ -29,7 +29,7 @@ import os
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-#extensions = ['rst2pdf.pdfbuilder']
+extensions = ['rst2pdf.pdfbuilder']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -45,9 +45,9 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'itucsdb'
-copyright = '2015, Team Name'
+copyright = '2016, ShakeSpace'
 
-#pdf_documents = [('index', u'Group 1603', u'Group 1603 Report', u'İpek Karakurt'),]
+#pdf_documents = [('index', u'Group 1603', u'Group 1603 Report', u'ShakeSpace'),]
 
 
 # The version info for the project you're documenting, acts as replacement for
