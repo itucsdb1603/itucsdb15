@@ -7,7 +7,7 @@ Welcome to itucsdb1603's documentation!
 
    * Ipek Karakurt
    * Mumtaz Cem Eris
-   * Member 3
+   * Emre Can Agatay
    * Member 4
    * Member 5
 
