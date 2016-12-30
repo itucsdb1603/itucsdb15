@@ -164,7 +164,7 @@ Let's have a quick look at add_moderator. It gets the moderator object and inser
                         cursor.execute(query, (moderator.nickname, moderator.password))
                         connection.commit()
 
-Route '/login' is for the visitors who have an account already. login_page() would first get the nickname, and using get_moderatorObj(), the moderator
+Route '/login' is for the visitor who has an account already. login_page() would first get the nickname, and using get_moderatorObj(), the moderator
 object 'mod' with given nickname would be returned. If there is no such 'mod' with given nickname, then 'mod' would be 'None'. If it is 'None' then
 error message 'Invalid credentials.' will be returned to the user. If not, then the password would be checked. If it matches with the hashed password
 in the database, then that moderator would be logged in. If the password is incorrect, same error message will be sent to the visitor.
@@ -206,7 +206,7 @@ below.
 **Admin**
 
 There is only one admin in ShakeSpace, that is the moderator with the nickname of 'admin'. Admin can basically access to the 'moderators_page'
-namely the admin panel in which the admin can add, remove or update moderators. It is a bit mentioned in 'User Manual' of my part with visual
+,namely the admin panel, in which the admin can add, remove or update moderators. It is a bit mentioned in 'User Manual' of my part with visual
 materials. Here, the three methods add, delete, and update will be discussed.
 
    .. code-block:: python
@@ -383,7 +383,7 @@ In update method, id of the moderator and the updated nickname is received and t
                    connection.commit()
                    cursor.close()
 
-Below, 4 get methods can be seen. get_moderator() gets nickname of the moderator and it returns all the imageposts that the corresponding
+Below, four get methods can be seen. get_moderator() gets nickname of the moderator and it returns all the imageposts that the corresponding
 moderator has been posted. get_moderatorName(self, modid) gets id of the moderator does the same thing as get_moderator().
 get_moderators(self) returns all the moderators. get_moderatorObj(self, mod_name) returns the moderator object with the given moderator nickname
 'mode_name'.
