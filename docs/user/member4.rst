@@ -1,15 +1,15 @@
 Parts Implemented by Batuhan İşlek
 ==================================
 
-Annoucements
-############
+**Annoucements**
+
 Announcement Table
-******************
+
 
 Announcements are initiliazed in the server.py :
 
 .. code-block:: python
-   :linenos:
+  
    
    @app.route('/init_announcements')
    def init_announcements_db():
@@ -33,12 +33,12 @@ Announcements are initiliazed in the server.py :
         connection.commit()
         return redirect(url_for('site.home_page'))
   
-Announcement Operations
-***********************
+**Announcement Operations**
+
 All announcement operations are held in the server.py :
 
 .. code-block:: python
-   :linenos:
+   
    
    @app.route('/announcements',  methods=['GET', 'POST'])
    def announcements_page():
@@ -93,8 +93,8 @@ All announcement operations are held in the server.py :
    
            return announcements
 
-Topics Class Definition
-***********************
+**Topics Class Definition**
+
 
 .. code-block:: python
    :linenos:
@@ -104,11 +104,11 @@ Topics Class Definition
         self.content = content
         self.writer = writer
         
-Topics List Class Definition
-****************************
+**Topics List Class Definition**
+
 
 .. code-block:: python
-   :linenos:
+   
 
     class TopicList:
     def __init__(self):
@@ -160,11 +160,11 @@ Topics List Class Definition
                           for id, content, writer, modname in cursor]
             return topicTableofMod
 
-Topics Adding Operation
-***********************
+**Topics Adding Operation**
+
 
 .. code-block:: python
-   :linenos:
+ 
    
    @Topics.route('/topics/add_topics', methods=['GET', 'POST'])
    @login_required
@@ -178,8 +178,8 @@ Topics Adding Operation
         current_app.topiclist.add_topic(topic)
         return redirect(url_for('Topics.topics_page'))
 
-Topics Adding Operation
-***********************
+**Topics Adding Operation**
+
 
 .. code-block:: python
    :linenos:
@@ -196,11 +196,11 @@ Topics Adding Operation
         return redirect(url_for('Topics.topics_page'))
         
 
-Topics Display Operation
-************************
+**Topics Display Operation**
+
  
 .. code-block:: python
-   :linenos:
+   
  
    @Topics.route('/topics')
    @login_required
