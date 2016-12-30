@@ -5,7 +5,7 @@ Following programs and extensions must be downloaded in order to run this projec
 
 **Python**
 
-To download Python 3.5 go to:
+To download Python 3.5 go to
 
    .. _a link: https://www.python.org/downloads/
 
@@ -22,7 +22,7 @@ You can use the command above to download these.
 
 **PostgreSQL**
 
-To download PostgreSQL go to:
+To download PostgreSQL go to
 
    .. _a link: https://www.postgresql.org/download/
 
