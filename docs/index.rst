@@ -5,7 +5,7 @@ Welcome to itucsdb1603's documentation!
 
 :Members:
 
-   * Member 1
+   * Ipek Karakurt
    * Mumtaz Cem Eris
    * Member 3
    * Member 4
