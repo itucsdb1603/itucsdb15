@@ -3,6 +3,46 @@ Parts Implemented by Mumtaz Cem Eris
 
 **Tables**
 
+There are two tables that are implemented by me. Tables can be seen from the '/initmods/' route which initializes 'MODERATORS'
+and 'IMGPOSTS'. IMGPOSTS's MODID references MODERATORS's ID.
+
+   .. code-block:: python
+
+      @mods.route('/initmods')
+      def init_mod_db():
+          with dbapi2.connect(app.config['dsn']) as connection:
+              cursor = connection.cursor()
+              query = """DROP TABLE IF EXISTS IMGPOSTS"""
+              cursor.execute(query)
+              query = """DROP TABLE IF EXISTS MODERATORS"""
+              cursor.execute(query)
+
+              query = """CREATE TABLE MODERATORS (
+              ID SERIAL,
+              NICKNAME VARCHAR(20) UNIQUE NOT NULL,
+              PASSWORD VARCHAR(300) NOT NULL,
+              IS_ADMIN VARCHAR(6),
+              PRIMARY KEY(ID)
+              )"""
+              cursor.execute(query)
+
+              query = """CREATE TABLE IMGPOSTS (
+              IMGID SERIAL,
+              IMGNAME VARCHAR(20),
+              IMGTYPE VARCHAR(10),
+              PRIMARY KEY(IMGID),
+              MODID INTEGER,
+              FOREIGN KEY (MODID) REFERENCES MODERATORS (ID)
+                  ON DELETE RESTRICT
+                  ON UPDATE CASCADE
+              )"""
+              cursor.execute(query)
+
+              connection.commit()
+              #flash('Moderators db is initialized.')
+              return redirect(url_for('site.signup_page'))
+
+
 **Logins**
 
 Starting from server.py, blueprints below and login manager are designed by me. It would be much clearer as you go further down.
@@ -39,6 +79,7 @@ Continuing with the blueprint 'site', it has 4 significant routes which are '/ho
 one by one below.
 
    .. code-block:: python
+
       @site.route('/home')
       def home_page():
           message = 'You have successfully logged in'
@@ -97,6 +138,7 @@ the database by add_moderator(). After that, this moderator will be logged in, a
 
 
    .. code-block:: python
+
          @site.route('/', methods=['GET', 'POST'])
          def signup_page():
              if request.method == 'GET':
@@ -114,6 +156,7 @@ the database by add_moderator(). After that, this moderator will be logged in, a
 Let's have a quick look at add_moderator. It gets the moderator object and inserts it into moderators table.
 
    .. code-block:: python
+
          def add_moderator(self, moderator):
                 with dbapi2.connect(app.config['dsn']) as connection:
                         cursor = connection.cursor()
@@ -127,6 +170,7 @@ error message 'Invalid credentials.' will be returned to the user. If not, then 
 in the database, then that moderator would be logged in. If the password is incorrect, same error message will be sent to the visitor.
 
    .. code-block:: python
+
       @site.route('/login', methods=['GET', 'POST'])
       def login_page():
           if request.method == 'GET':
@@ -152,6 +196,7 @@ Route '/logout' is pretty straightforward, the current moderator would be logged
 below.
 
    .. code-block:: python
+
       @site.route('/logout')
       def logout_page():
           logout_user()
@@ -165,6 +210,7 @@ namely the admin panel in which the admin can add, remove or update moderators. 
 materials. Here, the three methods add, delete, and update will be discussed.
 
    .. code-block:: python
+
       @mods.route('/moderators/add', methods=['GET', 'POST'])
       @login_required
       def mod_add_page():
@@ -216,6 +262,7 @@ There is possibility of having 'abort(401)', although no moderators can see this
 the moderator is added to the database in signup page with hashing.
 
    .. code-block:: python
+
       @mods.route('/moderators/add', methods=['GET', 'POST'])
       @login_required
       def mod_add_page():
@@ -238,6 +285,7 @@ of the moderator. Then it calls delete_moderator() with given id, and this funct
 database. You can check 'Moderators' header for more detail about moderator functions.
 
    .. code-block:: python
+
       @mods.route('/profile/remove', methods=['GET', 'POST'])
       @login_required
       def mod_remove_page():
@@ -255,6 +303,7 @@ Finally, admin can update moderators' nicknames. The function gets the current a
 sends id and the new nickname to update_moderator() and this method updates the moderator in the database.
 
    .. code-block:: python
+
       @mods.route('/moderators/update', methods=['GET', 'POST'])
       @login_required
       def mod_update_page():
@@ -275,6 +324,7 @@ It is crucial to know moderators since all users are treated as moderators. Firs
 'UserMixin', and plus it has 'nickname' and 'password' variables.
 
    .. code-block:: python
+
       class Moderator(UserMixin):
           def __init__(self, nickname, password):
               self.nickname = nickname
@@ -294,6 +344,7 @@ add_moderator(self, moderator) will be examined. It gets a moderator object and 
 table.
 
    .. code-block:: python
+
        def add_moderator(self, moderator):
            with dbapi2.connect(app.config['dsn']) as connection:
                    cursor = connection.cursor()
@@ -306,6 +357,7 @@ delete_moderator(self, mod_id) gets id of the moderator, and first deletes the i
 in the user manual as well. Then it deletes the moderator using its id.
 
    .. code-block:: python
+
        def delete_moderator(self, mod_id):
            with dbapi2.connect(app.config['dsn']) as connection:
                    cursor = connection.cursor()
@@ -320,6 +372,7 @@ in the user manual as well. Then it deletes the moderator using its id.
 In update method, id of the moderator and the updated nickname is received and the moderator is updated related to the information.
 
    .. code-block:: python
+
        def update_moderator(self, mod_id, newName):
            with dbapi2.connect(app.config['dsn']) as connection:
                    cursor = connection.cursor()
@@ -336,6 +389,7 @@ get_moderators(self) returns all the moderators. get_moderatorObj(self, mod_name
 'mode_name'.
 
    .. code-block:: python
+
        def get_moderator(self, modName):
                with dbapi2.connect(app.config['dsn']) as connection:
                    cursor = connection.cursor()
@@ -383,3 +437,150 @@ get_moderators(self) returns all the moderators. get_moderatorObj(self, mod_name
                        mod = Moderator(mod_name, mod_pass[0])  #[0]
                    cursor.close()
                    return mod
+
+
+There is also profile page of the moderator. It uses get_moderators() method to get all the moderators. In profile page, the current moderator can
+see other moderators as well. See user manual for screenshots.
+
+   .. code-block:: python
+
+      @mods.route('/profile', methods=['GET', 'POST'])
+      @login_required
+      def profile_page():
+          moderators = current_app.moderatorlist.get_moderators()
+          return render_template('profile.html', moderators=moderators)
+
+'/moderators' route is admin panel. This page is explained in 'Admin' part. moderators_page() method uses get_moderators() to post all the moderators.
+
+   .. code-block:: python
+
+      @mods.route('/moderators')
+      @login_required
+      def moderators_page():
+          moderators = current_app.moderatorlist.get_moderators()
+          return render_template('moderators.html', moderators=moderators)
+
+
+**Image Posts**
+
+Class of the image post is below. It includes name of the image, and foreign key id of the moderator.
+
+   .. code-block:: python
+
+      class ImgPost:
+          def __init__(self, imgname, modid):
+              self.imgname = imgname
+              self.modid = modid
+          def change_nickname(self, newimgname):
+              self.imgname = newimgname
+
+ImgPostList class is below. add_imgPost(self, imgPost) inserts the given image post object to the database. delete_imgPost(self, imgPost_id)
+deletes the image post from the database using its id. update_imgPost(self, imgPost_id, newName) works similarly as update_moderator(self, mod_id, newName).
+get_imgPost(self, imgName) returns the id, name and id of the moderator of the given image post. get_imgPostList(self) returns all the image posts
+along with the moderators who posted them.
+
+   .. code-block:: python
+
+      class ImgPostList:
+          def __init__(self):
+                  self.last_key = None
+
+          def add_imgPost(self, imgPost):
+                  with dbapi2.connect(app.config['dsn']) as connection:
+                      cursor = connection.cursor()
+                      query = """INSERT INTO IMGPOSTS (IMGNAME, MODID) VALUES (%s, %s)"""
+                      cursor.execute(query, (imgPost.imgname, imgPost.modid))
+                      connection.commit()
+
+          def delete_imgPost(self, imgPost_id):
+                  with dbapi2.connect(app.config['dsn']) as connection:
+                      cursor = connection.cursor()
+                      #toBeDeleted = ImgPostList.get_imgPost(imgPost_id)
+                      #for row in cursor:
+                      #    id, nickname = row
+                      statement ="""DELETE FROM IMGPOSTS WHERE (IMGID = (%s))"""
+                      cursor.execute(statement, (imgPost_id,))
+                      connection.commit()
+
+          def update_imgPost(self, imgPost_id, newName):
+              with dbapi2.connect(app.config['dsn']) as connection:
+                      cursor = connection.cursor()
+                      statement ="""UPDATE IMGPOSTS
+                      SET IMGNAME = (%s)
+                      WHERE (IMGID = (%s))"""
+                      cursor.execute(statement, (newName, imgPost_id))
+                      connection.commit()
+
+
+          def get_imgPost(self, imgName):
+                  with dbapi2.connect(app.config['dsn']) as connection:
+                      cursor = connection.cursor()
+                      query = """SELECT IMGID FROM IMGPOSTS WHERE (IMGNAME = (%s))"""
+                      cursor.execute(query, (imgName, ))
+                      imgid = cursor.fetchone()
+                      #imgid, imgname, modid
+                      connection.commit()
+                  return imgid
+
+          def get_imgPostList(self):
+                  #modid = app.get_moderator(current_user.nickname)
+                  with dbapi2.connect(app.config['dsn']) as connection:
+                      cursor = connection.cursor()
+                      query = """SELECT IMGID, IMGNAME, MODID, NICKNAME FROM IMGPOSTS JOIN
+                      MODERATORS ON MODID=ID
+                      ORDER BY IMGID"""
+                      cursor.execute(query)
+                      imgPostTable = [(id, ImgPost(imgname, modid), modname)
+                                for id, imgname, modid, modname in cursor]
+                  return imgPostTable
+
+Routes for the image posts are given below. Their approach is pretty similar to moderators routes' approach. imgposts_page() provides
+image posts feed using get_imgPostList(). imgpost_add_page() adds the image post with given name and using current_user it validates
+the information of the moderator who posted it and creates image post object according to that. imgpost_remove_page() deletes the image post
+with given name using get_imgPost(imgname) and delete_imgPost(imgid). Finally, imgpost_update_page() updates corresponding image post using
+get_imgPost(imgname) and update_imgPost(imgid, newimgname).
+
+   .. code-block:: python
+
+      @imgPosts.route('/imageposts')
+      @login_required
+      def imgposts_page():
+          imgposts = app.imgpostlist.get_imgPostList()
+          return render_template('imgposts.html', imgposts=imgposts)
+
+      @imgPosts.route('/imageposts/add_image_posts', methods=['GET', 'POST'])
+      @login_required
+      def imgpost_add_page():
+          if request.method == 'GET':
+              return render_template('imgpost_add.html')
+          else:
+              imgname = str(request.form['imgname'])
+              modid = app.moderatorlist.get_moderator(current_user.nickname)
+              imgPost = ImgPost(imgname, modid)
+              current_app.imgpostlist.add_imgPost(imgPost)
+              return redirect(url_for('imgPosts.imgposts_page'))
+
+      @imgPosts.route('/imageposts/imgpost_remove', methods=['GET', 'POST'])
+      @login_required
+      def imgpost_remove_page():
+          if request.method == 'GET':
+              return render_template('imgpost_remove.html')
+          else:
+              imgname = str(request.form['imgname'])
+              imgid = current_app.imgpostlist.get_imgPost(imgname)
+              current_app.imgpostlist.delete_imgPost(imgid)
+              return redirect(url_for('imgPosts.imgposts_page'))
+
+
+
+      @imgPosts.route('/imageposts/imgpost_update', methods=['GET', 'POST'])
+      @login_required
+      def imgpost_update_page():
+          if request.method == 'GET':
+              return render_template('imgpost_update.html')
+          else:
+              imgname = str(request.form['imgname'])
+              newimgname = str(request.form['newimgname'])
+              imgid = current_app.imgpostlist.get_imgPost(imgname) # to be updated
+              current_app.imgpostlist.update_imgPost(imgid, newimgname)
+              return redirect(url_for('imgPosts.imgposts_page'))
