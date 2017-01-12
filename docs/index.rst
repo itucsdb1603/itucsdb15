@@ -5,10 +5,10 @@ Welcome to itucsdb1603's documentation!
 
 :Members:
 
-   * Ipek Karakurt
-   * Mumtaz Cem Eris
-   * Batuhan İşlek
-   * Emre Can Agatay
+    Ipek Karakurt
+    Mumtaz Cem Eris
+    Batuhan İşlek
+    Emre Can Agatay
    
 
 **ShakeSpace**
