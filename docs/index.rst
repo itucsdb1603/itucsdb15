@@ -4,7 +4,11 @@ Welcome to itucsdb1603's documentation!
 :Team: ShakeSpace
 
 :Members:
-    Batuhan İşlek
+    
+    * Ipek Karakurt
+    * Mumtaz Cem Eris
+    * Batuhan İşlek
+    * Emre Can Agatay
    
 
 **ShakeSpace**
